@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Food Discovery Assistant",
+  "name": "AlgoBite — AI Food Discovery",
   "version": "2.0.0",
   "description": "Sync a YouTube playlist (Watch Later or food playlist) to automatically build your personal restaurant AI database.",
   "icons": {
@@ -11,7 +11,7 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icons/icon48.png",
-    "default_title": "Food Discovery AI"
+    "default_title": "AlgoBite"
   },
   "permissions": [
     "activeTab",

@@ -1,6 +1,7 @@
-# 🍽️ Food Discovery Assistant
+# 🍽️ AlgoBite
 
-> An AI-powered personalized restaurant recommender that turns your saved YouTube food review playlists into real-time, road-feasible dining recommendations based on your current location, schedule, and preferences.
+> **AI-Powered Food Discovery & Context-Aware Navigation Assistant**  
+> An intelligent system that transforms your saved YouTube food review playlists into real-time, road-feasible dining recommendations based on your current location, schedule, and preferences.
 
 ---
 
@@ -14,7 +15,7 @@ Meanwhile, food lovers already do the research — saving food reviews and vlog 
 
 ## 🚀 The Solution
 
-**Food Discovery Assistant** bridges this gap:
+**AlgoBite** bridges this gap:
 1. **Ingests** your saved YouTube food playlists and extracts spoken recommendations using speech-to-text.
 2. **Structures** unstructured video reviews into restaurant profiles (cuisines, dishes, pricing, operating hours).
 3. **Calculates** real road driving times (via OSRM) from where you are standing right now.
