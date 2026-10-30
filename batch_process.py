@@ -860,21 +860,33 @@ def process_single_url(url: str, city: str = "", video_type: str = "", client=No
             save_config(config)
         return [], "No specific restaurant could be identified from this video."
 
-    for r in extracted:
-        r["source_url"]   = url
-        r["source_video"] = Path(audio_path).name
+    cleaned_extracted = []
+    for raw_r in extracted:
+        raw_r["source_url"]   = url
+        raw_r["source_video"] = Path(audio_path).name
 
         # Ensure complete schema sanitization before database insertion
-        r = sanitize_restaurant_record(r, clean_city, title=title, description=description)
+        clean_r = sanitize_restaurant_record(raw_r, clean_city, title=title, description=description)
+        if not clean_r or not clean_r.get("restaurant_name"):
+            continue
 
         # Tag with the YouTube account that discovered this restaurant
         if user_id:
-            r["source_user_id"]   = user_id
-            r["source_user_name"] = user_name or user_id
+            clean_r["source_user_id"]   = user_id
+            clean_r["source_user_name"] = user_name or user_id
+
+        cleaned_extracted.append(clean_r)
+
+    extracted = cleaned_extracted
+    if not extracted:
+        return [], "No valid restaurant could be identified from this video."
 
     restaurants = load_restaurants()
-    existing_urls = {r.get("source_url") for r in restaurants}
-    new_to_add = [r for r in extracted if r.get("source_url") not in existing_urls]
+    existing_pairs = {(r.get("source_url"), r.get("source_user_id"), r.get("restaurant_name")) for r in restaurants}
+    new_to_add = [
+        r for r in extracted
+        if (r.get("source_url"), r.get("source_user_id"), r.get("restaurant_name")) not in existing_pairs
+    ]
     if new_to_add:
         restaurants.extend(new_to_add)
         save_restaurants(restaurants)
@@ -910,9 +922,14 @@ if __name__ == "__main__":
     parser.add_argument("--url", help="Process a single video URL")
     parser.add_argument("--city", default="auto", help="City name or 'auto' to detect from video metadata")
     parser.add_argument("--type", default="auto", help="short_form, long_form, or 'auto' to detect from duration")
+    parser.add_argument("--user-id", default=None, help="User ID tagging the restaurant")
+    parser.add_argument("--user-name", default=None, help="Display name of user tagging the restaurant")
     args = parser.parse_args()
 
+    user_id = args.user_id or os.environ.get("FOOD_DISCOVERY_USER_ID")
+    user_name = args.user_name or os.environ.get("FOOD_DISCOVERY_USER_NAME")
+
     if args.url:
-        process_single_url(args.url, args.city, args.type)
+        process_single_url(args.url, args.city, args.type, user_id=user_id, user_name=user_name)
     else:
         run_batch()
