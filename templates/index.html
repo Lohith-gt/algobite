@@ -745,6 +745,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const mm = String(now.getMinutes()).padStart(2,'0');
     document.getElementById('time-input').value = `${hh}:${mm}`;
 
+    // Preserve selected city on change
+    const citySel = document.getElementById('city-select');
+    if (citySel) {
+        citySel.addEventListener('change', (e) => {
+            if (e.target.value) {
+                localStorage.setItem('algobite_selected_city', e.target.value);
+            }
+        });
+    }
+
     // Load sidebar data
     loadSidebarData();
     loadDbData();
@@ -1020,8 +1030,12 @@ function populateCityDropdowns(cities) {
     selects.forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
+        const currentVal = el.value || (id === 'city-select' ? (localStorage.getItem('algobite_selected_city') || '') : '');
         const defaultOpt = id === 'city-select' ? '<option value="">Select a city…</option>' : '<option value="">All Cities</option>';
         el.innerHTML = defaultOpt + cities.map(c => `<option value="${c}">${c}</option>`).join('');
+        if (currentVal && cities.includes(currentVal)) {
+            el.value = currentVal;
+        }
     });
 }
 function renderCityList(restaurants) {
@@ -1038,6 +1052,12 @@ function renderCityList(restaurants) {
     document.getElementById('city-list').innerHTML = html || '<div class="font-mono text-xs text-sage">No cities found</div>';
 }
 function filterByCity(city) {
+    const citySelect = document.getElementById('city-select');
+    if (currentPage === 'search' && citySelect) {
+        citySelect.value = city;
+        localStorage.setItem('algobite_selected_city', city);
+        return;
+    }
     navigateTo('db');
     document.getElementById('db-city-filter').value = city;
     applyDbFilters();
