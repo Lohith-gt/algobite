@@ -72,7 +72,21 @@ def load_restaurant_database() -> list:
         return []
     
     with open(RESTAURANTS_DB_PATH, "r", encoding="utf-8") as f:
-        restaurants = json.load(f)
+        raw_restaurants = json.load(f)
+    from step6_router import filter_restaurants_by_travel_time
+    import re
+    def _is_valid(n):
+        if not n or not isinstance(n, str): return False
+        nc = n.strip()
+        if not nc or nc.lower() in ["null", "none", "unknown", "popular food spot"]: return False
+        return not any(re.search(p, nc, re.IGNORECASE) for p in [
+            r'^\d+\s+(popular|best|top|must|famous|major|iconic)',
+            r'^(major|top|best|popular)\s+\d+',
+            r'\b(food spots|food listicle|places to eat|food walk|food tour|street food compilation)\b',
+            r'\bspots in [a-zA-Z]+\b',
+            r'\bfood guide\b',
+        ])
+    restaurants = [r for r in raw_restaurants if _is_valid(r.get("restaurant_name"))]
     
     print(f"[FOLDER] Loaded {len(restaurants)} restaurants from database")
     return restaurants

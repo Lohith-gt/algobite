@@ -55,13 +55,39 @@ app.secret_key = "food_discovery_secret_2024"
 
 # ── Helpers ───────────────────────────────────────────────────────
 
+def is_valid_restaurant_name(name: str) -> bool:
+    """
+    Validates that a restaurant name is a genuine establishment,
+    and NOT a video title, listicle, or compilation headline.
+    """
+    if not name or not isinstance(name, str):
+        return False
+    name_clean = name.strip()
+    if not name_clean or name_clean.lower() in ["null", "none", "unknown", "popular food spot"]:
+        return False
+    
+    import re
+    invalid_patterns = [
+        r'^\d+\s+(popular|best|top|must|famous|major|iconic)',
+        r'^(major|top|best|popular)\s+\d+',
+        r'\b(food spots|food listicle|places to eat|food walk|food tour|street food compilation)\b',
+        r'\bspots in [a-zA-Z]+\b',
+        r'\bfood guide\b',
+    ]
+    for pattern in invalid_patterns:
+        if re.search(pattern, name_clean, re.IGNORECASE):
+            return False
+    return True
+
+
 def load_restaurants() -> list:
-    """Load the restaurant database from disk."""
+    """Load the restaurant database from disk, strictly filtering out any listicle/video titles."""
     if not RESTAURANTS_DB.exists():
         return []
     try:
         with open(RESTAURANTS_DB, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            return [r for r in data if is_valid_restaurant_name(r.get("restaurant_name"))]
     except Exception:
         return []
 

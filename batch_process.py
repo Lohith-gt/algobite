@@ -474,6 +474,26 @@ def _cross_verify_restaurant(restaurant: dict) -> dict:
     return restaurant
 
 
+def is_valid_restaurant_name(name: str) -> bool:
+    if not name or not isinstance(name, str):
+        return False
+    name_clean = name.strip()
+    if not name_clean or name_clean.lower() in ["null", "none", "unknown", "popular food spot"]:
+        return False
+    import re
+    invalid_patterns = [
+        r'^\d+\s+(popular|best|top|must|famous|major|iconic)',
+        r'^(major|top|best|popular)\s+\d+',
+        r'\b(food spots|food listicle|places to eat|food walk|food tour|street food compilation)\b',
+        r'\bspots in [a-zA-Z]+\b',
+        r'\bfood guide\b',
+    ]
+    for pattern in invalid_patterns:
+        if re.search(pattern, name_clean, re.IGNORECASE):
+            return False
+    return True
+
+
 def sanitize_restaurant_record(r: dict, clean_city: str, title: str = "", description: str = "") -> dict:
     """
     Guarantees strict schema integrity, clean naming, and zero-NoneType invariants
@@ -491,7 +511,10 @@ def sanitize_restaurant_record(r: dict, clean_city: str, title: str = "", descri
             if candidate:
                 name = candidate
                 break
-    r["restaurant_name"] = name or "Popular Food Spot"
+    # Check if name is valid (not a listicle or compilation video title)
+    if not is_valid_restaurant_name(name):
+        return {}
+    r["restaurant_name"] = name
 
     # 2. Strict city normalization (never state names or Unknown)
     city_cand = (r.get("city") or clean_city or "").strip()
@@ -575,6 +598,8 @@ def extract_with_gemini(transcript: str, city: str, video_type: str, client, tit
                 sanitized_data = []
                 for r in data:
                     r = sanitize_restaurant_record(r, clean_city, title=title, description=description)
+                    if not r or not is_valid_restaurant_name(r.get("restaurant_name")):
+                        continue
                     # Cross-verify: quick Nominatim lookup to check if restaurant + city is plausible
                     r = _cross_verify_restaurant(r)
                     sanitized_data.append(r)
