@@ -132,8 +132,8 @@ Project_GenAI/
 
 ```powershell
 # 1. Clone the repository
-git clone https://github.com/Lohith-gt/food-discovery-assistant.git
-cd food-discovery-assistant
+git clone https://github.com/Lohith-gt/algobite.git
+cd algobite
 
 # 2. Set up virtual environment
 python -m venv venv
