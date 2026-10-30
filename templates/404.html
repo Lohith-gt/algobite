@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 – Page Not Found · Food Discovery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --bg: #F7F4EF; --text: #121917; --accent: #C86D51; --muted: #7A8C85; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .font-serif { font-family: 'Cormorant Garamond', serif; }
+        .font-mono  { font-family: 'JetBrains Mono', monospace; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+        .float { animation: float 3s ease-in-out infinite; }
+    </style>
+</head>
+<body class="flex items-center justify-center p-8">
+    <div class="text-center max-w-md mx-auto">
+        <!-- Floating emoji -->
+        <div class="text-7xl mb-6 float" aria-hidden="true">🍜</div>
+
+        <!-- 404 code -->
+        <div class="font-mono text-xs tracking-widest text-[#7A8C85] mb-2 uppercase">Error 404</div>
+
+        <!-- Headline -->
+        <h1 class="font-serif text-5xl font-semibold text-[#121917] mb-3">
+            Dish Not Found
+        </h1>
+
+        <!-- Subtext -->
+        <p class="text-[#7A8C85] text-sm leading-relaxed mb-8">
+            Looks like this page wandered off the menu.<br>
+            Let's get you back to something delicious.
+        </p>
+
+        <!-- CTA -->
+        <a href="/"
+           class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1D4ED8] text-white font-semibold text-sm hover:bg-[#1e40af] transition-colors">
+            ← Back to Food Discovery
+        </a>
+
+        <!-- Decorative divider -->
+        <div class="mt-12 font-mono text-xs text-[#7A8C85]/50">
+            food_discovery_assistant · v1.0
+        </div>
+    </div>
+</body>
+</html>

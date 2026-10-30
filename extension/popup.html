@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Food Discovery Assistant</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">
+      <img src="icons/icon48.png" alt="logo" width="28" height="28">
+      <span class="title">Food Discovery AI</span>
+    </div>
+    <div id="backend-status" class="status-badge checking">
+      <span class="dot"></span>
+      <span id="status-text">Checking...</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Active Account Section -->
+    <div class="card account-card">
+      <div class="card-label">ACTIVE YOUTUBE ACCOUNT</div>
+      <div id="account-info" class="account-info">
+        <div class="account-avatar">👤</div>
+        <div class="account-details">
+          <div id="account-name-display" class="account-name">Detecting...</div>
+          <div id="account-id-display" class="account-id">—</div>
+        </div>
+        <div id="account-badge" class="account-badge">—</div>
+      </div>
+      <div class="account-note">
+        Restaurants synced from <em>this account's playlist</em> will only appear when this account is active.
+      </div>
+    </div>
+
+    <!-- Playlist Sync Section -->
+    <div class="card">
+      <div class="card-label">SYNC A YOUTUBE PLAYLIST</div>
+      <p class="card-hint">
+        Go to your <strong>Watch Later</strong> or any saved food playlist on YouTube.
+        The sync bar will appear automatically at the top of the playlist page.
+      </p>
+
+      <div class="playlist-steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <span>Go to <a href="https://www.youtube.com/playlist?list=WL" target="_blank">Watch Later ↗</a> or any YouTube playlist</span>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <span>Click <strong>"🚀 Sync All Food Videos"</strong> in the bar at the top of the page</span>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <span>The AI pipeline processes each video and adds restaurants to your personal database</span>
+        </div>
+      </div>
+
+      <button id="open-watch-later-btn" class="btn primary-btn" style="margin-top: 8px;">
+        <span>▶ Open My Watch Later Playlist</span>
+      </button>
+    </div>
+
+    <!-- Live Status Toast -->
+    <div id="toast-message" class="toast hidden"></div>
+
+    <!-- Recent Tasks -->
+    <div class="card tasks-card">
+      <div class="tasks-header">
+        <span class="card-label">INGESTION QUEUE</span>
+        <button id="refresh-tasks-btn" class="icon-btn" title="Refresh">🔄</button>
+      </div>
+      <div id="tasks-list" class="tasks-list">
+        <div class="empty-state">No active ingestion tasks</div>
+      </div>
+    </div>
+
+    <!-- My Stats -->
+    <div class="card">
+      <div class="card-label">MY DATABASE STATS</div>
+      <div id="user-stats" class="user-stats">
+        <div class="stat-item">
+          <span class="stat-value" id="stat-my-restaurants">—</span>
+          <span class="stat-label">My restaurants</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-total">—</span>
+          <span class="stat-label">Total in DB</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-cities">—</span>
+          <span class="stat-label">Cities</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <a href="http://localhost:8501" target="_blank" class="app-link">
+      🔍 Open Food Discovery Web App →
+    </a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

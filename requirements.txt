@@ -1,0 +1,36 @@
+# Food Discovery Project Dependencies
+
+# ── Web Server ──────────────────────────────────────────────────────
+flask>=3.0.0
+markdown2>=2.4.0
+bcrypt>=4.0.0
+
+# ── Video downloading from YouTube & Instagram ──────────────────────
+yt-dlp
+
+# ── Audio transcription (converts speech in videos to text) ─────────
+openai-whisper
+
+# ── Google Gemini AI - NEW official SDK ─────────────────────────────
+google-genai
+
+# ── Google OAuth & YouTube Data API ─────────────────────────────────
+google-auth-oauthlib>=1.2.0
+google-api-python-client>=2.100.0
+
+# ── For loading .env files (your API keys) ──────────────────────────
+python-dotenv
+
+# ── Utility libraries ────────────────────────────────────────────────
+requests
+tqdm
+geopy>=2.5.0
+pandas>=1.4.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# ── Legacy (Streamlit prototype — not used in Flask version) ─────────
+# streamlit>=1.64.0
+# folium>=0.20.0
+# streamlit-folium>=0.27.0
+# fastapi>=0.115.0

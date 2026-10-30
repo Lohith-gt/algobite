@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 – Server Error · Food Discovery</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --bg: #F7F4EF; --text: #121917; --accent: #C86D51; --muted: #7A8C85; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        .font-serif { font-family: 'Cormorant Garamond', serif; }
+        .font-mono  { font-family: 'JetBrains Mono', monospace; }
+        @keyframes shake { 0%,100%{transform:rotate(0)} 20%{transform:rotate(-8deg)} 40%{transform:rotate(8deg)} 60%{transform:rotate(-4deg)} 80%{transform:rotate(4deg)} }
+        .shake { animation: shake 0.8s ease-in-out 1s both; }
+    </style>
+</head>
+<body class="flex items-center justify-center p-8">
+    <div class="text-center max-w-md mx-auto">
+        <!-- Shaking emoji -->
+        <div class="text-7xl mb-6 shake" aria-hidden="true">🔥</div>
+
+        <!-- 500 code -->
+        <div class="font-mono text-xs tracking-widest text-[#7A8C85] mb-2 uppercase">Error 500</div>
+
+        <!-- Headline -->
+        <h1 class="font-serif text-5xl font-semibold text-[#121917] mb-3">
+            Kitchen's on Fire
+        </h1>
+
+        <!-- Subtext -->
+        <p class="text-[#7A8C85] text-sm leading-relaxed mb-8">
+            Something went wrong on our end — the AI chef needs a moment.<br>
+            Please try again in a few seconds.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex items-center justify-center gap-3 flex-wrap">
+            <button onclick="window.location.reload()"
+                    class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1D4ED8] text-white font-semibold text-sm hover:bg-[#1e40af] transition-colors">
+                ↺ Try Again
+            </button>
+            <a href="/"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#121917]/20 text-[#121917] font-semibold text-sm hover:border-[#1D4ED8] hover:text-[#1D4ED8] transition-colors">
+                ← Home
+            </a>
+        </div>
+
+        <!-- Decorative divider -->
+        <div class="mt-12 font-mono text-xs text-[#7A8C85]/50">
+            food_discovery_assistant · v1.0
+        </div>
+    </div>
+</body>
+</html>

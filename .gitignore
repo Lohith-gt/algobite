@@ -1,0 +1,51 @@
+# ── Secrets & API Keys ─────────────────────────────────────────
+.env
+
+# ── Python ─────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual Environment ─────────────────────────────────────────
+venv/
+env/
+.venv/
+
+# ── Data Files (may contain personal info / large files) ───────
+data/restaurants.json
+data/users.json
+data/local_users.json
+data/geocache.json
+data/hours_cache.json
+data/tokens/
+
+# ── Downloaded Media (large files, not needed in repo) ─────────
+videos/raw/
+videos/transcripts/
+
+# ── OS Files ───────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE Files ──────────────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── Temp / Debug ───────────────────────────────────────────────
+temp_snip.txt
+search_debug_output.json
+*.log
+scratch/
+
+# ── FFmpeg binary (too large for GitHub) ───────────────────────
+ffmpeg.exe
+
+# ── Streamlit ──────────────────────────────────────────────────
+.streamlit/secrets.toml

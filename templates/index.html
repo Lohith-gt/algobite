@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Discovery Assistant</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Cormorant Garamond, Plus Jakarta Sans, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Leaflet.js -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+    <!-- marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        alabaster: '#F7F4EF', sand: '#EFEAE1', parchment: '#E5DEC9',
+                        obsidian: '#121917', forest: '#1B2823', sage: '#52685B',
+                        terracotta: '#C86D51', sunset: '#D4A373',
+                        darkbg: '#0B100E', darkcard: '#121A17', darkborder: '#202E29'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        :root {
+            --bg-primary: #F7F4EF;
+            --bg-secondary: #EFEAE1;
+            --text-primary: #121917;
+            --text-muted: #5A6560;
+            --accent-terra: #C86D51;
+            --accent-gold: #D4A373;
+            --border-subtle: rgba(18, 25, 23, 0.1);
+        }
+        html.dark {
+            --bg-primary: #0B100E;
+            --bg-secondary: #121A17;
+            --text-primary: #F4EFE6;
+            --text-muted: #98A6A0;
+            --accent-terra: #E07A5F;
+            --accent-gold: #DFB284;
+            --border-subtle: rgba(244, 239, 230, 0.1);
+        }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            transition: background-color 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        /* Film Grain */
+        .film-grain {
+            position: fixed; inset: 0; pointer-events: none; z-index: 9998; opacity: 0.028;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        /* Spring Entrance */
+        @keyframes meridianEntrance {
+            0% { opacity: 0; transform: translateY(14px) scale(0.992); filter: blur(8px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0px); }
+        }
+        .spring-reveal { opacity: 0; animation: meridianEntrance 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .stagger-1 { animation-delay: 0.04s; } .stagger-2 { animation-delay: 0.10s; }
+        .stagger-3 { animation-delay: 0.16s; } .stagger-4 { animation-delay: 0.22s; }
+        /* Page Transitions */
+        .page-view {
+            display: none; opacity: 0; transform: translateY(12px); filter: blur(4px);
+            transition: opacity 0.38s cubic-bezier(0.16, 1, 0.3, 1), transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), filter 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform, filter;
+        }
+        .page-view.active-page { display: block; }
+        .page-view.page-visible { opacity: 1; transform: translateY(0); filter: blur(0px); }
+        /* Card Cascade */
+        @keyframes cardCascade {
+            from { opacity: 0; transform: translateY(14px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0px); }
+        }
+        .cascade-item { opacity: 0; animation: cardCascade 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        /* Sliding Nav Pill */
+        #nav-pill-indicator {
+            position: absolute; top: 5px; bottom: 5px; left: 0; border-radius: 9999px;
+            transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), width 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none; z-index: 0;
+        }
+        /* Glass Header */
+        .glass-header {
+            background: rgba(247, 244, 239, 0.84);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(18, 25, 23, 0.08);
+        }
+        html.dark .glass-header {
+            background: rgba(11, 16, 14, 0.84);
+            border-bottom: 1px solid rgba(244, 239, 230, 0.08);
+        }
+        /* Atlas Card */
+        .atlas-card {
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease;
+        }
+        .atlas-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px -15px rgba(18, 25, 23, 0.14); }
+        html.dark .atlas-card:hover { box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6); }
+        /* Leaflet Map */
+        #food-leaflet-map {
+            width: 100%; height: 100%; z-index: 10; background: #121917;
+            border-radius: 1rem; overflow: hidden;
+        }
+        .map-tile-warm .leaflet-tile-pane {
+            filter: sepia(16%) saturate(108%) contrast(102%) brightness(99%);
+        }
+        .leaflet-control-attribution {
+            font-family: 'JetBrains Mono', monospace !important; font-size: 9px !important;
+            background: rgba(18, 25, 23, 0.65) !important; color: rgba(247, 244, 239, 0.7) !important;
+            backdrop-filter: blur(6px); border-radius: 6px 0 0 0; padding: 2px 6px !important;
+        }
+        .leaflet-control-attribution a { color: #D4A373 !important; }
+        /* Custom Pin */
+        .meridian-pin-wrapper {
+            position: relative; width: 48px; height: 48px; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .meridian-pin-wrapper:hover { transform: scale(1.22) translateY(-4px); z-index: 999 !important; }
+        .meridian-pin-halo {
+            position: absolute; inset: -5px; border-radius: 9999px; opacity: 0.45;
+            animation: haloPulse 2.4s infinite cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        @keyframes haloPulse {
+            0% { transform: scale(0.92); opacity: 0.65; }
+            70% { transform: scale(1.45); opacity: 0; }
+            100% { transform: scale(1.45); opacity: 0; }
+        }
+        .meridian-pin-circle {
+            width: 36px; height: 36px; border-radius: 9999px; border: 2.5px solid #F7F4EF;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.45); position: relative; z-index: 2;
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+        }
+        /* Shimmer */
+        @keyframes shimmerSweep {
+            0% { background-position: -200% 0; } 100% { background-position: 200% 0; }
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, rgba(200,109,81,0.08) 25%, rgba(200,109,81,0.22) 50%, rgba(200,109,81,0.08) 75%);
+            background-size: 200% 100%; animation: shimmerSweep 1.5s infinite linear;
+        }
+        /* No scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* AI Card markdown styles */
+        .ai-content h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 700; margin: 1rem 0 0.5rem; }
+        .ai-content h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 600; margin: 0.75rem 0 0.35rem; color: var(--accent-terra); }
+        .ai-content p { margin: 0.4rem 0; line-height: 1.7; font-size: 0.9rem; }
+        .ai-content strong { font-weight: 700; }
+        .ai-content a { color: var(--accent-terra); text-decoration: underline; }
+        .ai-content ul, .ai-content ol { padding-left: 1.5rem; margin: 0.4rem 0; }
+        .ai-content li { margin: 0.2rem 0; font-size: 0.9rem; }
+        .ai-content hr { border-color: var(--border-subtle); margin: 1rem 0; }
+        /* Range slider styling */
+        input[type=range] { accent-color: #1D4ED8; }
+        /* Form inputs */
+        .form-input {
+            width: 100%; padding: 0.6rem 0.85rem; border-radius: 0.75rem;
+            border: 1px solid rgba(18,25,23,0.15); background: rgba(255,255,255,0.6);
+            color: var(--text-primary); font-size: 0.875rem; outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit;
+        }
+        html.dark .form-input {
+            background: rgba(18,26,23,0.8); border-color: #202E29; color: #F4EFE6;
+        }
+        .form-input:focus { border-color: #1D4ED8; box-shadow: 0 0 0 3px rgba(29,78,216,0.15); }
+        .form-label { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.04em; margin-bottom: 0.35rem; display: block; color: var(--text-muted); text-transform: uppercase; }
+        /* Auth modal backdrop */
+        #auth-modal { background: rgba(11,16,14,0.82); backdrop-filter: blur(12px); }
+        /* Sidebar */
+        #sidebar { height: calc(100vh - 4.5rem); top: 4.5rem; }
+        /* Pipeline stepper */
+        .stepper-step .step-circle { transition: border-color 0.3s ease, background-color 0.3s ease; }
+        .stepper-step.done .step-circle { border-color: #22c55e; background-color: #22c55e; }
+        .stepper-step.active .step-circle { border-color: #C86D51; }
+        .stepper-step.done .step-label { color: #22c55e; }
+        .stepper-step.active .step-label { color: var(--text-primary); font-weight: 600; }
+        @keyframes step-pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .stepper-step.active .step-circle { animation: step-pulse 1.2s infinite; }
+    </style>
+</head>
+<body class="min-h-screen selection:bg-terracotta selection:text-white">
+
+<!-- Skip to main content for accessibility (UXDT / WCAG) -->
+<a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[99999] focus:px-4 focus:py-2 focus:bg-[#1D4ED8] focus:text-white focus:rounded-full focus:font-mono focus:text-xs focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-white">
+    Skip to main content
+</a>
+
+<!-- Film grain overlay -->
+<div class="film-grain"></div>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header class="glass-header fixed top-0 left-0 right-0 z-50 h-[4.5rem]">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 h-full grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+
+        <!-- LEFT: Wordmark -->
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-full bg-obsidian dark:bg-sand flex items-center justify-center flex-shrink-0 shadow-sm">
+                <svg class="w-4 h-4 text-alabaster dark:text-obsidian" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                    <circle cx="12" cy="12" r="9" stroke-opacity="0.45"/>
+                    <polygon points="12,4 14.4,9.6 20,12 14.4,14.4 12,20 9.6,14.4 4,12 9.6,9.6" fill="currentColor" stroke="none"/>
+                    <circle cx="12" cy="12" r="2" fill="#C86D51" stroke="none"/>
+                </svg>
+            </div>
+            <div>
+                <div class="font-mono text-[11px] tracking-[0.22em] uppercase font-semibold text-obsidian dark:text-sand leading-none">FOOD DISCOVERY</div>
+                <div class="font-serif italic text-terracotta text-[11px] leading-none mt-0.5">ASSISTANT</div>
+            </div>
+        </div>
+
+        <!-- CENTER: Sliding pill nav -->
+        <nav class="hidden md:flex items-center relative p-1.5 rounded-full bg-sand/90 dark:bg-darkcard/90 border border-obsidian/10 dark:border-white/10 shadow-inner" id="desktop-nav-container">
+            <div id="nav-pill-indicator" class="bg-obsidian dark:bg-terracotta shadow-sm"></div>
+            <button onclick="navigateTo('search')" data-nav="search" class="nav-tab relative z-10 px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-colors duration-200 flex items-center gap-1.5 text-alabaster dark:text-obsidian">
+                <i class="ph ph-magnifying-glass"></i><span>Search</span>
+            </button>
+            <button onclick="navigateTo('add')" data-nav="add" id="nav-add-desktop" class="nav-tab relative z-10 px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-colors duration-200 flex items-center gap-1.5 text-obsidian/75 dark:text-white/75 hover:text-obsidian dark:hover:text-white">
+                <i class="ph ph-youtube-logo"></i><span>Add</span>
+            </button>
+            <button onclick="navigateTo('db')" data-nav="db" class="nav-tab relative z-10 px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-colors duration-200 flex items-center gap-1.5 text-obsidian/75 dark:text-white/75 hover:text-obsidian dark:hover:text-white">
+                <i class="ph ph-database"></i><span>Database</span>
+            </button>
+        </nav>
+
+        <!-- RIGHT: Dark mode toggle + auth -->
+        <div class="flex items-center justify-end gap-2">
+            <button onclick="toggleTheme()" class="w-9 h-9 rounded-full border border-obsidian/15 dark:border-white/15 flex items-center justify-center hover:bg-sand dark:hover:bg-darkcard transition-colors" aria-label="Toggle theme">
+                <i class="ph ph-moon text-base dark:hidden"></i>
+                <i class="ph ph-sun text-base hidden dark:inline text-sunset"></i>
+            </button>
+            <!-- Auth button -->
+            <button onclick="toggleAuthPanel()" id="auth-btn" class="flex items-center gap-2 px-3.5 py-2 rounded-full bg-sand/80 dark:bg-darkcard border border-obsidian/10 dark:border-white/10 hover:border-terracotta transition-colors text-xs font-medium">
+                <span id="auth-avatar" class="w-6 h-6 rounded-full bg-obsidian dark:bg-sand text-alabaster dark:text-obsidian text-[10px] font-bold flex items-center justify-center flex-shrink-0 hidden"></span>
+                <i id="auth-icon" class="ph ph-user text-sm"></i>
+                <span id="auth-label">Sign In</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile nav -->
+    <div class="flex md:hidden items-center justify-around border-t border-obsidian/10 dark:border-white/10 py-2 px-2 bg-alabaster/95 dark:bg-darkcard/95 backdrop-blur-md">
+        <button onclick="navigateTo('search')" data-nav-mobile="search" class="flex flex-col items-center gap-0.5 text-[10px] font-medium text-terracotta">
+            <i class="ph ph-magnifying-glass text-base"></i><span>Search</span>
+        </button>
+        <button onclick="navigateTo('add')" data-nav-mobile="add" id="nav-add-mobile" class="flex flex-col items-center gap-0.5 text-[10px] font-medium opacity-60">
+            <i class="ph ph-youtube-logo text-base"></i><span>Add</span>
+        </button>
+        <button onclick="navigateTo('db')" data-nav-mobile="db" class="flex flex-col items-center gap-0.5 text-[10px] font-medium opacity-60">
+            <i class="ph ph-database text-base"></i><span>Database</span>
+        </button>
+    </div>
+</header>
+
+<!-- ══════════════ MAIN LAYOUT ══════════════ -->
+<div class="flex pt-[4.5rem] md:pt-[4.5rem] max-w-[1400px] mx-auto min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="hidden lg:flex flex-col w-64 xl:w-72 flex-shrink-0 sticky overflow-y-auto no-scrollbar border-r border-obsidian/8 dark:border-darkborder px-4 py-5 gap-4">
+
+        <!-- Profile card -->
+        <div id="sidebar-profile" class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-2xl p-4 text-center spring-reveal stagger-1 transition-colors hover:border-terracotta/50">
+            <div id="profile-avatar-sb" class="w-12 h-12 rounded-full bg-obsidian dark:bg-parchment text-alabaster dark:text-obsidian text-xl font-bold flex items-center justify-center mx-auto mb-2">?</div>
+            <div id="profile-name-sb" class="font-serif text-base font-semibold">Guest User</div>
+            <div id="profile-username-sb" class="font-mono text-[11px] text-sage mt-0.5">@guest</div>
+            <div class="flex flex-wrap justify-center gap-1.5 mt-2.5">
+                <span id="pill-private" class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-terracotta/10 text-terracotta/80 border border-terracotta/25">Private Profile</span>
+                <span id="pill-guest" class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-obsidian/6 text-sage border border-obsidian/12 dark:bg-white/5 dark:border-white/10">Guest</span>
+            </div>
+            <button id="signout-btn" onclick="signOut()" class="hidden mt-3 w-full text-xs text-sage hover:text-terracotta transition-colors font-mono py-1">Sign Out</button>
+        </div>
+
+        <!-- Saved places metric -->
+        <div class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-2xl p-4 spring-reveal stagger-2">
+            <div class="font-mono text-xs uppercase tracking-wider text-sage mb-1">Saved Places</div>
+            <div id="saved-count" class="font-serif text-3xl font-bold text-obsidian dark:text-sand">—</div>
+            <div class="font-mono text-xs text-sage mt-0.5">restaurants in database</div>
+        </div>
+
+        <!-- City list -->
+        <div class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-2xl p-4 flex-1 spring-reveal stagger-3">
+            <div class="font-mono text-xs uppercase tracking-wider text-sage mb-3">Cities</div>
+            <div id="city-list" class="space-y-1.5">
+                <div class="h-4 skeleton-shimmer rounded-full"></div>
+                <div class="h-4 skeleton-shimmer rounded-full"></div>
+                <div class="h-4 skeleton-shimmer rounded-full"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="font-mono text-xs text-sage/80 leading-relaxed px-1 spring-reveal stagger-4">
+            Food Discovery Assistant
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content" class="flex-1 min-w-0 px-4 sm:px-6 py-6" tabindex="-1">
+
+        <!-- ══ PAGE: SEARCH ══ -->
+        <div id="page-search" class="page-view active-page page-visible">
+            <div class="spring-reveal stagger-1">
+                <!-- Info strip -->
+                <div id="info-strip" class="mb-5 px-4 py-3 rounded-xl bg-terracotta/8 border border-terracotta/20 border-l-4 border-l-terracotta text-sm text-terracotta dark:text-sunset font-medium flex items-center gap-2.5">
+                    <i class="ph ph-shield-check text-base flex-shrink-0"></i>
+                    <span id="info-strip-text">Private Mode — Searching across all community restaurants</span>
+                </div>
+
+                <!-- Search form -->
+                <div class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-5 sm:p-6 mb-5 atlas-card">
+                    <div class="flex items-center gap-2.5 mb-5">
+                        <div class="w-8 h-8 rounded-xl bg-obsidian dark:bg-terracotta flex items-center justify-center flex-shrink-0">
+                            <i class="ph ph-fork-knife text-alabaster text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-serif text-lg font-semibold">Find Your Next Meal</div>
+                            <div class="font-mono text-xs text-sage">AI-powered restaurant discovery</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Left column -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="city-select" class="form-label">City</label>
+                                <select id="city-select" class="form-input">
+                                    <option value="">Loading cities…</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="location-input" class="form-label">Your Current Location</label>
+                                <input type="text" id="location-input" class="form-input" placeholder="e.g. Bengaluru Railway Station">
+                            </div>
+                            <div>
+                                <label for="prefs-input" class="form-label">Dietary Preferences</label>
+                                <input type="text" id="prefs-input" class="form-input" placeholder="e.g. vegetarian, no spice…">
+                            </div>
+                        </div>
+                        <!-- Right column -->
+                        <div class="space-y-4">
+                            <div>
+                                <label for="time-input" class="form-label">Arrival Time</label>
+                                <input type="time" id="time-input" class="form-input" value="">
+                            </div>
+                            <div>
+                                <label for="hours-slider" class="form-label flex items-center justify-between">
+                                    <span>Available Hours</span>
+                                    <span id="hours-val" class="text-terracotta font-semibold text-xs">2.0 hrs</span>
+                                </label>
+                                <input type="range" id="hours-slider" min="0.5" max="5" step="0.5" value="2" class="w-full mt-1" aria-label="Available time in hours" aria-valuemin="0.5" aria-valuemax="5" aria-valuenow="2" oninput="document.getElementById('hours-val').textContent = parseFloat(this.value).toFixed(1) + ' hrs'; this.setAttribute('aria-valuenow', this.value);">
+                            </div>
+                            <div>
+                                <label for="dining-slider" class="form-label flex items-center justify-between">
+                                    <span>Dining Time</span>
+                                    <span id="dining-val" class="text-terracotta font-semibold text-xs">40 min</span>
+                                </label>
+                                <input type="range" id="dining-slider" min="20" max="90" step="5" value="40" class="w-full mt-1" aria-label="Dining time in minutes" aria-valuemin="20" aria-valuemax="90" aria-valuenow="40" oninput="document.getElementById('dining-val').textContent = this.value + ' min'; this.setAttribute('aria-valuenow', this.value);">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="runSearch()" id="search-btn" class="mt-5 w-full sm:w-auto px-7 py-2.5 rounded-full bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold tracking-wide flex items-center gap-2 transition-all active:scale-95 shadow-sm hover:shadow">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <span>Get Recommendations</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results (hidden until search) -->
+            <div id="search-results" class="hidden space-y-5">
+
+                <!-- Loading state — Pipeline Progress Stepper -->
+                <div id="search-loading" class="hidden">
+                    <div class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-6">
+                        <div class="flex items-center gap-3 mb-5">
+                            <div class="w-10 h-10 rounded-full border-2 border-terracotta/30 border-t-terracotta animate-spin flex-shrink-0"></div>
+                            <div>
+                                <div class="font-serif text-base font-semibold text-obsidian dark:text-sand" id="stepper-headline">Searching…</div>
+                                <div class="font-mono text-xs text-sage">Pipeline running · may take 15–30 seconds</div>
+                            </div>
+                        </div>
+                        <!-- Steps -->
+                        <div class="space-y-2" id="stepper-steps">
+                            <div class="stepper-step flex items-center gap-3" id="step-geocode">
+                                <div class="w-5 h-5 rounded-full border-2 border-sage/40 flex items-center justify-center flex-shrink-0 step-circle">
+                                    <i class="ph ph-circle text-sage/40 text-xs step-icon-pending"></i>
+                                </div>
+                                <span class="font-mono text-xs text-sage/70 step-label">Locating your position on the map</span>
+                            </div>
+                            <div class="stepper-step flex items-center gap-3" id="step-routing">
+                                <div class="w-5 h-5 rounded-full border-2 border-sage/40 flex items-center justify-center flex-shrink-0 step-circle">
+                                    <i class="ph ph-circle text-sage/40 text-xs step-icon-pending"></i>
+                                </div>
+                                <span class="font-mono text-xs text-sage/70 step-label">Calculating travel times via road network</span>
+                            </div>
+                            <div class="stepper-step flex items-center gap-3" id="step-hours">
+                                <div class="w-5 h-5 rounded-full border-2 border-sage/40 flex items-center justify-center flex-shrink-0 step-circle">
+                                    <i class="ph ph-circle text-sage/40 text-xs step-icon-pending"></i>
+                                </div>
+                                <span class="font-mono text-xs text-sage/70 step-label">Checking opening hours &amp; availability</span>
+                            </div>
+                            <div class="stepper-step flex items-center gap-3" id="step-crowd">
+                                <div class="w-5 h-5 rounded-full border-2 border-sage/40 flex items-center justify-center flex-shrink-0 step-circle">
+                                    <i class="ph ph-circle text-sage/40 text-xs step-icon-pending"></i>
+                                </div>
+                                <span class="font-mono text-xs text-sage/70 step-label">Estimating crowd levels &amp; wait times</span>
+                            </div>
+                            <div class="stepper-step flex items-center gap-3" id="step-gemini">
+                                <div class="w-5 h-5 rounded-full border-2 border-sage/40 flex items-center justify-center flex-shrink-0 step-circle">
+                                    <i class="ph ph-circle text-sage/40 text-xs step-icon-pending"></i>
+                                </div>
+                                <span class="font-mono text-xs text-sage/70 step-label">Asking AI to pick the best option</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Travel times table -->
+                <div id="travel-table-wrap" class="hidden bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-5 atlas-card">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i class="ph ph-map-pin text-terracotta text-base"></i>
+                        <span class="font-serif text-base font-semibold">Travel Times</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm border-collapse" id="travel-table">
+                            <thead>
+                                <tr class="border-b border-obsidian/10 dark:border-darkborder">
+                                    <th class="text-left py-2 px-3 font-mono text-xs uppercase tracking-wider text-sage">Restaurant</th>
+                                    <th class="text-left py-2 px-3 font-mono text-xs uppercase tracking-wider text-sage">Distance</th>
+                                    <th class="text-left py-2 px-3 font-mono text-xs uppercase tracking-wider text-sage">One-Way</th>
+                                    <th class="text-left py-2 px-3 font-mono text-xs uppercase tracking-wider text-sage">Total</th>
+                                    <th class="text-left py-2 px-3 font-mono text-xs uppercase tracking-wider text-sage">Feasible</th>
+                                </tr>
+                            </thead>
+                            <tbody id="travel-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div id="quick-links-wrap" class="hidden bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-5 atlas-card">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ph ph-link text-terracotta text-base"></i>
+                        <span class="font-serif text-base font-semibold">Quick Links</span>
+                    </div>
+                    <div id="quick-links-body" class="flex flex-wrap gap-2"></div>
+                </div>
+
+                <!-- Map -->
+                <div id="map-wrap" class="hidden bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-5 atlas-card">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="ph ph-globe-hemisphere-west text-terracotta text-base"></i>
+                        <span class="font-serif text-base font-semibold">Restaurant Map</span>
+                    </div>
+                    <div class="map-tile-warm rounded-2xl overflow-hidden" style="height:380px;">
+                        <div id="food-leaflet-map"></div>
+                    </div>
+                </div>
+
+                <!-- AI Recommendation -->
+                <div id="ai-card" class="hidden bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder border-l-4 border-l-terracotta rounded-3xl p-5 sm:p-6 atlas-card">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-8 h-8 rounded-xl bg-terracotta/10 dark:bg-terracotta/20 flex items-center justify-center flex-shrink-0">
+                            <i class="ph ph-sparkle text-terracotta text-sm"></i>
+                        </div>
+                        <div>
+                            <div class="font-serif text-base font-semibold">AI's Recommendation</div>
+                            <div class="font-mono text-xs text-sage">AI-powered food guide</div>
+                        </div>
+                    </div>
+                    <div id="ai-content" class="ai-content prose prose-sm max-w-none"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ PAGE: ADD ══ -->
+        <div id="page-add" class="page-view">
+            <div class="spring-reveal stagger-1">
+                <div class="mb-5">
+                    <div class="font-serif text-2xl font-bold mb-1">Add Food Content</div>
+                    <div class="font-mono text-xs text-sage">Process YouTube videos to grow your restaurant database</div>
+                </div>
+
+                <!-- Sub-tabs -->
+                <div class="flex gap-1 p-1 bg-sand/80 dark:bg-darkcard/80 rounded-full border border-obsidian/10 dark:border-darkborder w-fit mb-5">
+                    <button onclick="switchAddTab('playlist')" id="add-tab-playlist" class="add-tab px-4 py-2 rounded-full text-xs font-medium transition-all bg-obsidian dark:bg-terracotta text-white">
+                        <i class="ph ph-playlist mr-1.5"></i>Playlist Sync
+                    </button>
+                    <button onclick="switchAddTab('video')" id="add-tab-video" class="add-tab px-4 py-2 rounded-full text-xs font-medium transition-all text-obsidian/70 dark:text-white/70 hover:text-obsidian dark:hover:text-white">
+                        <i class="ph ph-youtube-logo mr-1.5"></i>Single Video
+                    </button>
+                </div>
+
+                <!-- Playlist Sync panel -->
+                <div id="add-panel-playlist" class="space-y-4">
+                    <div class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-5 sm:p-6 atlas-card">
+                        <div class="flex items-center gap-2.5 mb-4">
+                            <div class="w-8 h-8 rounded-xl bg-obsidian dark:bg-terracotta flex items-center justify-center flex-shrink-0">
+                                <i class="ph ph-playlist text-alabaster text-sm"></i>
+                            </div>
+                            <div>
+                                <div class="font-serif text-base font-semibold">Sync YouTube Playlist</div>
+                                <div class="font-mono text-xs text-sage">Extract all food videos at once</div>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="playlist-url" class="form-label">YouTube Playlist URL</label>
+                                <textarea id="playlist-url" rows="2" class="form-input resize-none" placeholder="https://www.youtube.com/playlist?list=..."></textarea>
+                            </div>
+                            <button onclick="linkPlaylist()" id="playlist-btn" class="px-6 py-2.5 rounded-full bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
+                                <i class="ph ph-arrows-clockwise"></i>
+                                <span>Link Playlist</span>
+                            </button>
+                        </div>
+                        <div id="playlist-status" class="hidden mt-4 p-3 rounded-xl font-mono text-xs"></div>
+                    </div>
+
+                    <!-- Linked Playlists on this account -->
+                    <div id="linked-playlists-section" class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-5 sm:p-6 atlas-card">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-xl bg-obsidian dark:bg-terracotta flex items-center justify-center flex-shrink-0">
+                                    <i class="ph ph-folders text-alabaster text-sm"></i>
+                                </div>
+                                <div>
+                                    <div class="font-serif text-base font-semibold">Your Linked Playlists</div>
+                                    <div class="font-mono text-xs text-sage">Playlists synced and active on this account</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="triggerPlaylistSync()" id="sync-now-btn" class="px-3 py-1 rounded-full bg-obsidian/6 hover:bg-obsidian/10 dark:bg-white/10 dark:hover:bg-white/15 text-xs font-mono flex items-center gap-1.5 transition-all active:scale-95 text-obsidian dark:text-white" title="Check for new videos in linked playlists">
+                                    <i class="ph ph-arrows-clockwise" id="sync-now-icon"></i>
+                                    <span id="sync-now-text">Sync Now</span>
+                                </button>
+                                <span id="linked-playlists-count" class="font-mono text-xs px-2.5 py-0.5 rounded-full bg-obsidian/6 dark:bg-white/5 border border-obsidian/10 dark:border-white/10 text-sage">0 linked</span>
+                            </div>
+                        </div>
+                        <div id="linked-playlists-list" class="space-y-3">
+                            <div class="text-xs text-sage font-mono py-4 text-center">Loading linked playlists…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Single Video panel -->
+                <div id="add-panel-video" class="hidden space-y-4">
+                    <div class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl p-5 sm:p-6 atlas-card">
+                        <div class="flex items-center gap-2.5 mb-4">
+                            <div class="w-8 h-8 rounded-xl bg-obsidian dark:bg-terracotta flex items-center justify-center flex-shrink-0">
+                                <i class="ph ph-youtube-logo text-alabaster text-sm"></i>
+                            </div>
+                            <div>
+                                <div class="font-serif text-base font-semibold">Process Single Video</div>
+                                <div class="font-mono text-xs text-sage">Transcribe + extract restaurant data</div>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <label for="video-url" class="form-label">YouTube Video URL</label>
+                                <input type="text" id="video-url" class="form-input" placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+                            <button onclick="processVideo()" id="video-btn" class="px-6 py-2.5 rounded-full bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
+                                <i class="ph ph-play-circle"></i>
+                                <span>Process Video</span>
+                            </button>
+                        </div>
+                        <div id="video-log" class="hidden mt-4 p-3 rounded-xl bg-obsidian/5 dark:bg-darkborder/30 border border-obsidian/10 dark:border-darkborder max-h-48 overflow-y-auto font-mono text-[11px] text-sage whitespace-pre-wrap"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ PAGE: DATABASE ══ -->
+        <div id="page-db" class="page-view">
+            <div class="spring-reveal stagger-1">
+                <div class="mb-5 flex items-center justify-between">
+                    <div>
+                        <div class="font-serif text-2xl font-bold mb-1">Restaurant Database</div>
+                        <div class="font-mono text-xs text-sage" id="db-subtitle">Browse all restaurants extracted from food videos</div>
+                    </div>
+                    <span id="db-user-badge" class="font-mono text-xs px-3 py-1 rounded-full bg-terracotta/10 text-terracotta border border-terracotta/30"></span>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-3 mb-5 p-4 bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-2xl">
+                    <div class="flex-1 min-w-32">
+                        <label for="db-city-filter" class="form-label">City</label>
+                        <select id="db-city-filter" class="form-input" onchange="applyDbFilters()">
+                            <option value="">All Cities</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 min-w-32">
+                        <label for="db-diet-filter" class="form-label">Diet</label>
+                        <select id="db-diet-filter" class="form-input" onchange="applyDbFilters()">
+                            <option value="">All</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="non-vegetarian">Non-Veg</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 min-w-32">
+                        <label for="db-meal-filter" class="form-label">Meal Type</label>
+                        <select id="db-meal-filter" class="form-input" onchange="applyDbFilters()">
+                            <option value="">All Meals</option>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="snacks">Snacks</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 min-w-40">
+                        <label for="db-search-filter" class="form-label">Search</label>
+                        <input type="text" id="db-search-filter" class="form-input" placeholder="Restaurant name…" oninput="applyDbFilters()">
+                    </div>
+                </div>
+
+                <!-- Cards grid -->
+                <div id="db-cards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                    <div class="col-span-full text-center py-12">
+                        <div class="w-10 h-10 rounded-full border-2 border-terracotta/30 border-t-terracotta animate-spin mx-auto mb-3"></div>
+                        <div class="font-mono text-xs text-sage">Loading database…</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══════════════ AUTH MODAL ══════════════ -->
+<div id="auth-modal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-alabaster dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-3xl shadow-2xl p-6 sm:p-8 spring-reveal relative">
+
+        <!-- Close / Guest skip -->
+        <button onclick="closeAuthModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-parchment dark:hover:bg-darkborder transition-colors text-sage hover:text-obsidian dark:hover:text-white">
+            <i class="ph ph-x text-base"></i>
+        </button>
+
+        <!-- Logo -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full bg-obsidian dark:bg-sand flex items-center justify-center flex-shrink-0">
+                <i class="ph ph-fork-knife text-alabaster dark:text-obsidian text-base"></i>
+            </div>
+            <div>
+                <div class="font-mono text-[11px] tracking-[0.2em] uppercase font-semibold text-obsidian dark:text-sand">FOOD DISCOVERY</div>
+                <div class="font-serif italic text-terracotta text-xs">Your AI Food Guide</div>
+            </div>
+        </div>
+
+        <!-- Auth tabs -->
+        <div class="flex gap-1 p-1 bg-sand dark:bg-darkborder/50 rounded-full border border-obsidian/10 dark:border-darkborder mb-5">
+            <button onclick="switchAuthTab('signin')" id="auth-tab-signin" class="auth-tab flex-1 py-2 rounded-full text-xs font-medium transition-all bg-obsidian dark:bg-terracotta text-white">Sign In</button>
+            <button onclick="switchAuthTab('register')" id="auth-tab-register" class="auth-tab flex-1 py-2 rounded-full text-xs font-medium transition-all text-obsidian/70 dark:text-white/70 hover:text-obsidian dark:hover:text-white">Create Account</button>
+            <button onclick="switchAuthTab('guest')" id="auth-tab-guest" class="auth-tab flex-1 py-2 rounded-full text-xs font-medium transition-all text-obsidian/70 dark:text-white/70 hover:text-obsidian dark:hover:text-white">Guest</button>
+        </div>
+
+        <!-- Sign In panel -->
+        <div id="auth-panel-signin" class="space-y-3">
+            <div>
+                <label for="signin-username" class="form-label">Username</label>
+                <input type="text" id="signin-username" class="form-input" placeholder="your_username">
+            </div>
+            <div>
+                <label for="signin-password" class="form-label">Password</label>
+                <input type="password" id="signin-password" class="form-input" placeholder="••••••••">
+            </div>
+            <div id="signin-error" class="hidden text-xs text-red-600 dark:text-red-400 font-mono py-1 px-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/30"></div>
+            <button onclick="doSignIn()" class="w-full py-2.5 rounded-full bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold transition-all active:scale-95 mt-1">Sign In</button>
+        </div>
+
+        <!-- Register panel -->
+        <div id="auth-panel-register" class="hidden space-y-3">
+            <div>
+                <label for="reg-display" class="form-label">Display Name</label>
+                <input type="text" id="reg-display" class="form-input" placeholder="Your Name">
+            </div>
+            <div>
+                <label for="reg-username" class="form-label">Username</label>
+                <input type="text" id="reg-username" class="form-input" placeholder="username_here">
+            </div>
+            <div>
+                <label for="reg-password" class="form-label">Password</label>
+                <input type="password" id="reg-password" class="form-input" placeholder="min. 6 characters">
+            </div>
+            <div id="reg-error" class="hidden text-xs text-red-600 dark:text-red-400 font-mono py-1 px-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/30"></div>
+            <button onclick="doRegister()" class="w-full py-2.5 rounded-full bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-sm font-semibold transition-all active:scale-95 mt-1">Create Account</button>
+        </div>
+
+        <!-- Guest panel -->
+        <div id="auth-panel-guest" class="hidden text-center space-y-4">
+            <div class="w-14 h-14 rounded-full bg-sand dark:bg-darkborder flex items-center justify-center mx-auto">
+                <i class="ph ph-user text-2xl text-sage"></i>
+            </div>
+            <p class="text-sm text-sage font-mono leading-relaxed">Continue as guest to search and browse restaurants without an account. Playlist sync requires signing in.</p>
+            <button onclick="continueAsGuest()" class="w-full py-2.5 rounded-full border border-obsidian/20 dark:border-darkborder hover:border-terracotta dark:hover:border-terracotta text-sm font-semibold transition-all active:scale-95">Continue as Guest</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════ JAVASCRIPT ══════════════ -->
+<script>
+// ─── State ───────────────────────────────────────────────
+let currentUser  = null;
+let allRestaurants = [];
+let leafletMap   = null;
+let mapMarkers   = [];
+let currentPage  = 'search';
+
+// ─── Init ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    // Restore theme
+    if (localStorage.getItem('foodDiscoveryTheme') === 'dark') {
+        document.documentElement.classList.add('dark');
+    }
+    // Restore user
+    const saved = localStorage.getItem('foodDiscoveryUser');
+    if (saved) {
+        try { currentUser = JSON.parse(saved); applyUserState(); }
+        catch(e) { localStorage.removeItem('foodDiscoveryUser'); }
+    }
+    // Set default arrival time to now
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2,'0');
+    const mm = String(now.getMinutes()).padStart(2,'0');
+    document.getElementById('time-input').value = `${hh}:${mm}`;
+
+    // Load sidebar data
+    loadSidebarData();
+    loadDbData();
+
+    // Show auth modal if no user
+    if (!currentUser) {
+        showAuthModal();
+    } else {
+        // Activate first page
+        setTimeout(() => activatePage('search'), 50);
+        triggerPlaylistSync();
+    }
+});
+
+// ─── Theme ─────────────────────────────────────────────────
+function toggleTheme() {
+    const html = document.documentElement;
+    html.classList.toggle('dark');
+    localStorage.setItem('foodDiscoveryTheme', html.classList.contains('dark') ? 'dark' : 'light');
+}
+
+// ─── Auth modal ────────────────────────────────────────────
+function showAuthModal() {
+    document.getElementById('auth-modal').style.display = 'flex';
+    setTimeout(() => activatePage('search'), 50);
+}
+function closeAuthModal() {
+    document.getElementById('auth-modal').style.display = 'none';
+    if (!currentUser) continueAsGuest();
+}
+function toggleAuthPanel() {
+    const modal = document.getElementById('auth-modal');
+    if (modal.style.display === 'flex') { modal.style.display = 'none'; }
+    else if (!currentUser) { modal.style.display = 'flex'; }
+    else { signOut(); }
+}
+function switchAuthTab(tab) {
+    ['signin','register','guest'].forEach(t => {
+        document.getElementById(`auth-panel-${t}`).classList.toggle('hidden', t !== tab);
+        const btn = document.getElementById(`auth-tab-${t}`);
+        if (t === tab) {
+            btn.classList.add('bg-obsidian','dark:bg-terracotta','text-white');
+            btn.classList.remove('text-obsidian/70','dark:text-white/70');
+        } else {
+            btn.classList.remove('bg-obsidian','dark:bg-terracotta','text-white');
+            btn.classList.add('text-obsidian/70','dark:text-white/70');
+        }
+    });
+}
+async function doSignIn() {
+    const username = document.getElementById('signin-username').value.trim();
+    const password = document.getElementById('signin-password').value;
+    const errEl    = document.getElementById('signin-error');
+    errEl.classList.add('hidden');
+    try {
+        const res = await fetch('/api/auth/login', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({username, password})
+        });
+        const data = await res.json();
+        if (data.ok) { loginSuccess(data.user); }
+        else { errEl.textContent = data.message; errEl.classList.remove('hidden'); }
+    } catch(e) {
+        errEl.textContent = 'Network error. Is the server running?';
+        errEl.classList.remove('hidden');
+    }
+}
+async function doRegister() {
+    const display_name = document.getElementById('reg-display').value.trim();
+    const username     = document.getElementById('reg-username').value.trim();
+    const password     = document.getElementById('reg-password').value;
+    const errEl        = document.getElementById('reg-error');
+    errEl.classList.add('hidden');
+    try {
+        const res = await fetch('/api/auth/register', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({username, password, display_name})
+        });
+        const data = await res.json();
+        if (data.ok) { loginSuccess(data.user); }
+        else { errEl.textContent = data.message; errEl.classList.remove('hidden'); }
+    } catch(e) {
+        errEl.textContent = 'Network error.';
+        errEl.classList.remove('hidden');
+    }
+}
+function getActiveUserId() {
+    if (!currentUser || !currentUser.user_id || currentUser.username === 'guest') {
+        return 'guest';
+    }
+    return currentUser.user_id;
+}
+function continueAsGuest() {
+    currentUser = { username: 'guest', display_name: 'Guest User', user_id: null };
+    localStorage.removeItem('foodDiscoveryUser');
+    applyUserState();
+    loadSidebarData();
+    document.getElementById('auth-modal').style.display = 'none';
+    activatePage('search');
+}
+function loginSuccess(user) {
+    currentUser = user;
+    localStorage.setItem('foodDiscoveryUser', JSON.stringify(user));
+    applyUserState();
+    loadSidebarData();
+    triggerPlaylistSync();
+    document.getElementById('auth-modal').style.display = 'none';
+    activatePage('search');
+}
+function signOut() {
+    fetch('/api/auth/logout', {method:'POST'}).catch(()=>{});
+    currentUser = null;
+    localStorage.removeItem('foodDiscoveryUser');
+    applyUserState();
+    loadSidebarData();
+    showAuthModal();
+}
+function applyUserState() {
+    const isGuest = !currentUser || currentUser.user_id === null || currentUser.username === 'guest';
+    const name    = currentUser ? currentUser.display_name : 'Guest User';
+    const uname   = currentUser ? currentUser.username : 'guest';
+    const initials= name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+
+    // Sidebar
+    const avatarSb = document.getElementById('profile-avatar-sb');
+    if (avatarSb) avatarSb.textContent = initials || '?';
+    const nameSb = document.getElementById('profile-name-sb');
+    if (nameSb) nameSb.textContent = name;
+    const unameSb = document.getElementById('profile-username-sb');
+    if (unameSb) unameSb.textContent = `@${uname}`;
+    const pillGuest = document.getElementById('pill-guest');
+    if (pillGuest) pillGuest.textContent = isGuest ? 'Guest' : 'Member';
+    const pillPrivate = document.getElementById('pill-private');
+    if (pillPrivate) pillPrivate.classList.toggle('hidden', isGuest);
+    const signoutBtn = document.getElementById('signout-btn');
+    if (signoutBtn) signoutBtn.classList.toggle('hidden', isGuest);
+
+    // Hide "Add" nav tab for guests — guests cannot add playlists or videos
+    const navAddDesktop = document.getElementById('nav-add-desktop');
+    const navAddMobile  = document.getElementById('nav-add-mobile');
+    if (navAddDesktop) navAddDesktop.classList.toggle('hidden', isGuest);
+    if (navAddMobile)  navAddMobile.classList.toggle('hidden', isGuest);
+
+    // Header auth button
+    const avatar = document.getElementById('auth-avatar');
+    const icon   = document.getElementById('auth-icon');
+    const label  = document.getElementById('auth-label');
+    if (!isGuest) {
+        if (avatar) { avatar.textContent = initials; avatar.classList.remove('hidden'); }
+        if (icon) icon.classList.add('hidden');
+        if (label) label.textContent = name.split(' ')[0];
+    } else {
+        if (avatar) avatar.classList.add('hidden');
+        if (icon) icon.classList.remove('hidden');
+        if (label) label.textContent = 'Sign In';
+    }
+
+    // Info strip
+    const strip = document.getElementById('info-strip-text');
+    if (strip) {
+        strip.textContent = isGuest
+            ? `Public Mode — Browsing full community database (${allRestaurants.length || 'all'} places)`
+            : `Personal Playlist Mode — Searching ${name}'s private saved videos`;
+    }
+}
+
+// ─── Navigation ────────────────────────────────────────────
+function navigateTo(page, force = false) {
+    const target = document.getElementById(`page-${page}`);
+    if (!force && currentPage === page && target?.classList.contains('active-page') && target?.classList.contains('page-visible')) {
+        return;
+    }
+    currentPage = page;
+
+    // Immediately remove active-page and page-visible from all pages without delayed timeouts
+    document.querySelectorAll('.page-view').forEach(sec => {
+        sec.classList.remove('page-visible');
+        sec.classList.remove('active-page');
+    });
+
+    if (target) {
+        target.classList.add('active-page');
+        // Force reflow for smooth CSS entrance transition
+        void target.offsetWidth;
+        target.classList.add('page-visible');
+    }
+
+    // Update nav pills
+    updateNavPill(page);
+
+    // If navigating back to search and map exists, invalidate size so tiles align
+    if (page === 'search' && leafletMap) {
+        setTimeout(() => leafletMap.invalidateSize(), 60);
+        setTimeout(() => leafletMap.invalidateSize(), 380);
+    }
+
+    // Load DB if navigating there
+    if (page === 'db' && allRestaurants.length === 0) {
+        loadDbData();
+    }
+    if (page === 'add') {
+        loadUserPlaylists();
+    }
+}
+
+function activatePage(page) {
+    navigateTo(page, true);
+}
+function updateNavPill(page) {
+    const navContainer = document.getElementById('desktop-nav-container');
+    if (!navContainer) return;
+    const activeBtn = navContainer.querySelector(`[data-nav="${page}"]`);
+    if (!activeBtn) return;
+    const pill = document.getElementById('nav-pill-indicator');
+    pill.style.width  = activeBtn.offsetWidth + 'px';
+    pill.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+    // Update tab text colors
+    navContainer.querySelectorAll('.nav-tab').forEach(btn => {
+        const isActive = btn.dataset.nav === page;
+        btn.classList.toggle('text-alabaster', isActive);
+        btn.classList.toggle('dark:text-obsidian', isActive);
+        btn.classList.toggle('text-obsidian/75', !isActive);
+        btn.classList.toggle('dark:text-white/75', !isActive);
+    });
+    // Mobile nav
+    document.querySelectorAll('[data-nav-mobile]').forEach(btn => {
+        const isActive = btn.dataset.navMobile === page;
+        btn.classList.toggle('text-terracotta', isActive);
+        btn.classList.toggle('opacity-60', !isActive);
+    });
+}
+// Re-compute pill on window resize
+window.addEventListener('resize', () => updateNavPill(currentPage));
+
+// ─── Sidebar Data ──────────────────────────────────────────
+async function loadSidebarData() {
+    try {
+        const uid = getActiveUserId();
+        // Cities for current user/guest
+        const cityRes = await fetch(`/api/cities?user_id=${encodeURIComponent(uid)}`);
+        const cities  = await cityRes.json();
+        populateCityDropdowns(cities);
+        // Restaurant count
+        const rRes = await fetch(`/api/restaurants?user_id=${encodeURIComponent(uid)}`);
+        const restaurants = await rRes.json();
+        allRestaurants = Array.isArray(restaurants) ? restaurants : [];
+        document.getElementById('saved-count').textContent = allRestaurants.length || '0';
+        // City distribution
+        renderCityList(allRestaurants);
+        renderDbCards(allRestaurants);
+
+        // Update Database tab header badge & subtitle
+        const dbBadge = document.getElementById('db-user-badge');
+        const dbSub = document.getElementById('db-subtitle');
+        if (dbBadge) {
+            dbBadge.textContent = uid === 'guest' 
+                ? `Community Places (${allRestaurants.length})` 
+                : `${currentUser ? currentUser.display_name : 'Your'} Playlist (${allRestaurants.length})`;
+        }
+        if (dbSub) {
+            dbSub.textContent = uid === 'guest'
+                ? 'Showing all community restaurants'
+                : `Showing private restaurants synced from ${currentUser ? currentUser.display_name : 'your'} YouTube food playlist`;
+        }
+        loadUserPlaylists();
+    } catch(e) {
+        document.getElementById('saved-count').textContent = 'Error';
+        document.getElementById('city-list').innerHTML = '<div class="font-mono text-xs text-red-500">Error loading data</div>';
+    }
+}
+function populateCityDropdowns(cities) {
+    const selects = ['city-select', 'db-city-filter'];
+    selects.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const defaultOpt = id === 'city-select' ? '<option value="">Select a city…</option>' : '<option value="">All Cities</option>';
+        el.innerHTML = defaultOpt + cities.map(c => `<option value="${c}">${c}</option>`).join('');
+    });
+}
+function renderCityList(restaurants) {
+    const counts = {};
+    restaurants.forEach(r => {
+        const c = r.city || 'Unknown';
+        counts[c] = (counts[c] || 0) + 1;
+    });
+    const html = Object.entries(counts).sort((a,b) => b[1]-a[1]).map(([city, count]) => `
+        <div class="flex items-center justify-between py-1 border-b border-obsidian/6 dark:border-darkborder last:border-0 cursor-pointer hover:text-terracotta transition-colors" onclick="filterByCity('${city}')">
+            <span class="text-xs truncate max-w-[70%]">${city}</span>
+            <span class="font-mono text-[11px] text-terracotta font-semibold flex-shrink-0">${count}</span>
+        </div>`).join('');
+    document.getElementById('city-list').innerHTML = html || '<div class="font-mono text-xs text-sage">No cities found</div>';
+}
+function filterByCity(city) {
+    navigateTo('db');
+    document.getElementById('db-city-filter').value = city;
+    applyDbFilters();
+}
+
+// ─── Database Page ─────────────────────────────────────────
+async function loadDbData() {
+    try {
+        const uid = getActiveUserId();
+        const res = await fetch(`/api/restaurants?user_id=${encodeURIComponent(uid)}`);
+        allRestaurants = await res.json();
+        renderDbCards(allRestaurants);
+    } catch(e) {
+        document.getElementById('db-cards').innerHTML = '<div class="col-span-full text-center py-8 font-mono text-xs text-red-500">Error loading database.</div>';
+    }
+}
+function applyDbFilters() {
+    const city  = (document.getElementById('db-city-filter').value || '').toLowerCase();
+    const diet  = (document.getElementById('db-diet-filter').value || '').toLowerCase();
+    const meal  = (document.getElementById('db-meal-filter').value || '').toLowerCase();
+    const query = (document.getElementById('db-search-filter').value || '').toLowerCase();
+    const filtered = allRestaurants.filter(r => {
+        if (city && !(r.city || '').toLowerCase().includes(city)) return false;
+        if (diet === 'vegetarian') {
+            const c = (r.cuisine_type || '').toLowerCase();
+            if (!c.includes('veg') || c.includes('non')) return false;
+        } else if (diet === 'non-vegetarian') {
+            const c = (r.cuisine_type || '').toLowerCase();
+            const hasMeat = ['non', 'chicken', 'mutton', 'meat', 'fish', 'seafood', 'biryani', 'biriyani'].some(m => c.includes(m));
+            if (!hasMeat) return false;
+        } else if (diet === 'vegan') {
+            const c = (r.cuisine_type || '').toLowerCase();
+            if (!c.includes('vegan')) return false;
+        }
+        if (meal) {
+            const mt = Array.isArray(r.meal_type) ? r.meal_type.join(' ').toLowerCase() : String(r.meal_type || '').toLowerCase();
+            if (!mt.includes(meal)) return false;
+        }
+        if (query) {
+            const q = query.toLowerCase();
+            const matchName = (r.restaurant_name || '').toLowerCase().includes(q);
+            const matchArea = (r.area_or_locality || '').toLowerCase().includes(q);
+            const matchDishes = (Array.isArray(r.must_try_dishes) ? r.must_try_dishes : []).some(d => d.toLowerCase().includes(q));
+            if (!matchName && !matchArea && !matchDishes) return false;
+        }
+        return true;
+    });
+    renderDbCards(filtered);
+}
+function renderDbCards(restaurants) {
+    if (!restaurants || restaurants.length === 0) {
+        document.getElementById('db-cards').innerHTML = '<div class="col-span-full text-center py-12 font-mono text-sm text-sage">No restaurants match the filter.</div>';
+        return;
+    }
+    const html = restaurants.map((r, i) => {
+        const name    = r.restaurant_name || 'Unknown';
+        const city    = r.city || '';
+        const area    = r.area_or_locality || '';
+        const cuisine = r.cuisine_type || '';
+        const meal    = (Array.isArray(r.meal_type) ? r.meal_type.join(', ') : r.meal_type) || '—';
+        const price   = (typeof r.price_range === 'object' && r.price_range !== null)
+            ? (r.price_range.description || r.price_range.approximate_cost_for_two || '—')
+            : (r.price_range || '—');
+        
+        // Diet inference
+        const cLower = (cuisine || '').toLowerCase();
+        let diet = '—';
+        if (cLower.includes('veg') && !cLower.includes('non')) diet = 'Vegetarian';
+        else if (['non', 'chicken', 'mutton', 'meat', 'fish', 'seafood', 'biryani'].some(m => cLower.includes(m))) diet = 'Non-Veg';
+
+        const dishes  = (Array.isArray(r.must_try_dishes) ? r.must_try_dishes : []).slice(0, 3);
+        const crowdObj = r.crowd_level;
+        const crowd   = (typeof crowdObj === 'object' && crowdObj !== null)
+            ? (crowdObj.description || crowdObj.usually_crowded_at || '')
+            : (crowdObj || '');
+        const mapsLink = r.google_maps_link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + ' ' + city)}`;
+        const dirLink  = r.google_maps_directions || mapsLink;
+
+        const verifiedBadge = r.location_verified === true
+            ? '<span class="text-xs px-2.5 py-0.5 rounded-full font-mono flex-shrink-0 bg-blue-100 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900/40">Verified</span>'
+            : '';
+
+        return `
+        <div class="bg-sand dark:bg-darkcard border border-obsidian/10 dark:border-darkborder rounded-2xl p-4 atlas-card cascade-item" style="animation-delay:${Math.min(i*0.04,0.5)}s">
+            <div class="flex items-start justify-between gap-2 mb-2">
+                <div class="font-serif text-base font-semibold leading-snug">${name}</div>
+                ${verifiedBadge}
+            </div>
+            <div class="font-mono text-xs text-sage mb-3">${[area, city].filter(Boolean).join(', ')}</div>
+            <div class="grid grid-cols-2 gap-1.5 mb-3">
+                ${cuisine ? `<div class="text-xs"><span class="text-sage">Cuisine</span><br><span class="font-medium">${cuisine}</span></div>` : ''}
+                ${meal ? `<div class="text-xs"><span class="text-sage">Meals</span><br><span class="font-medium capitalize">${meal}</span></div>` : ''}
+                ${price && price !== '—' ? `<div class="text-xs"><span class="text-sage">Price</span><br><span class="font-medium capitalize">${price}</span></div>` : ''}
+                ${diet && diet !== '—' ? `<div class="text-xs"><span class="text-sage">Diet</span><br><span class="font-medium capitalize">${diet}</span></div>` : ''}
+            </div>
+            ${dishes.length ? `<div class="text-xs text-sage mb-2">🍽 <span class="font-medium text-obsidian dark:text-sand">${dishes.join(' · ')}</span></div>` : ''}
+            ${crowd ? `<div class="text-xs text-sage mb-3">👥 ${crowd}</div>` : ''}
+            <div class="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-obsidian/6 dark:border-darkborder">
+                <a href="${mapsLink}" target="_blank" class="text-xs px-2.5 py-1.5 rounded-full border border-terracotta/30 text-terracotta hover:bg-terracotta/5 transition-colors font-mono flex items-center gap-1">
+                    <i class="ph ph-map-pin text-xs"></i> Map
+                </a>
+                <a href="${dirLink}" target="_blank" class="text-xs px-2.5 py-1.5 rounded-full border border-obsidian/15 dark:border-darkborder text-sage hover:border-terracotta hover:text-terracotta transition-colors font-mono flex items-center gap-1">
+                    <i class="ph ph-navigation-arrow text-xs"></i> Directions
+                </a>
+                ${r.source_url ? `
+                <a href="${r.source_url}" target="_blank" class="text-xs px-2.5 py-1.5 rounded-full border border-red-500/30 text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors font-mono flex items-center gap-1 ml-auto">
+                    <i class="ph ph-youtube-logo text-sm text-red-500"></i> Video
+                </a>` : ''}
+            </div>
+        </div>`;
+    }).join('');
+    document.getElementById('db-cards').innerHTML = html;
+}
+
+// ─── Search ────────────────────────────────────────────────
+
+// Stepper helper — marks a step done and the next one active
+function stepperAdvance(doneId, nextId) {
+    const done = document.getElementById(doneId);
+    const next = nextId ? document.getElementById(nextId) : null;
+    if (done) {
+        done.classList.remove('active');
+        done.classList.add('done');
+        done.querySelector('.step-circle').innerHTML = '<i class="ph ph-check text-white text-xs"></i>';
+        done.querySelector('.step-label').style.textDecoration = 'line-through';
+    }
+    if (next) {
+        next.classList.add('active');
+        document.getElementById('stepper-headline').textContent = next.querySelector('.step-label').textContent + '…';
+    }
+}
+function stepperReset() {
+    ['step-geocode','step-routing','step-hours','step-crowd','step-gemini'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.className = 'stepper-step flex items-center gap-3';
+        el.querySelector('.step-circle').innerHTML = '<i class="ph ph-circle text-sage/40 text-xs step-icon-pending"></i>';
+        el.querySelector('.step-label').style.textDecoration = '';
+    });
+    document.getElementById('stepper-headline').textContent = 'Searching…';
+}
+
+async function runSearch() {
+    const city     = document.getElementById('city-select').value;
+    const location = document.getElementById('location-input').value.trim();
+    const time     = document.getElementById('time-input').value;
+    const hours    = parseFloat(document.getElementById('hours-slider').value);
+    const dining   = parseInt(document.getElementById('dining-slider').value);
+    const prefs    = document.getElementById('prefs-input').value.trim();
+
+    if (!city) { alert('Please select a city.'); return; }
+    if (!location) { alert('Please enter your current location.'); return; }
+
+    // Show results area + loading
+    document.getElementById('search-results').classList.remove('hidden');
+    document.getElementById('search-loading').classList.remove('hidden');
+    document.getElementById('travel-table-wrap').classList.add('hidden');
+    document.getElementById('quick-links-wrap').classList.add('hidden');
+    document.getElementById('map-wrap').classList.add('hidden');
+    document.getElementById('ai-card').classList.add('hidden');
+
+    const btn = document.getElementById('search-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></div><span>Searching…</span>';
+
+    // Animate stepper — timed to approximate real pipeline stages
+    stepperReset();
+    document.getElementById('step-geocode').classList.add('active');
+    document.getElementById('stepper-headline').textContent = 'Locating your position on the map…';
+    const t1 = setTimeout(() => stepperAdvance('step-geocode','step-routing'), 2000);
+    const t2 = setTimeout(() => stepperAdvance('step-routing','step-hours'),   7000);
+    const t3 = setTimeout(() => stepperAdvance('step-hours','step-crowd'),    12000);
+    const t4 = setTimeout(() => stepperAdvance('step-crowd','step-gemini'),   17000);
+
+    try {
+        const res = await fetch('/api/search', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                location, city,
+                arrival_time: time,
+                available_hours: hours,
+                preferences: prefs,
+                dining_minutes: dining,
+                user_id: getActiveUserId() === 'guest' ? null : getActiveUserId()
+            })
+        });
+        const data = await res.json();
+
+        // Clear pending timers + mark all steps done
+        [t1,t2,t3,t4].forEach(clearTimeout);
+        ['step-geocode','step-routing','step-hours','step-crowd','step-gemini'].forEach(id => stepperAdvance(id, null));
+        document.getElementById('search-loading').classList.add('hidden');
+
+        if (!data.ok) {
+            document.getElementById('ai-card').classList.remove('hidden');
+            document.getElementById('ai-content').innerHTML = `<div class="text-red-600 dark:text-red-400 font-mono text-sm p-3 bg-red-50 dark:bg-red-900/20 rounded-xl">${data.message}</div>`;
+            return;
+        }
+
+        const restaurants = data.restaurants || [];
+
+        // Travel table
+        if (restaurants.length > 0) {
+            renderTravelTable(restaurants);
+            renderQuickLinks(restaurants);
+            renderMap(restaurants, data.user_location);
+        }
+
+        // AI suggestion
+        if (data.suggestion) {
+            document.getElementById('ai-card').classList.remove('hidden');
+            document.getElementById('ai-content').innerHTML = marked.parse(data.suggestion);
+            setTimeout(() => {
+                document.getElementById('ai-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+    } catch(e) {
+        [t1,t2,t3,t4].forEach(clearTimeout);
+        document.getElementById('search-loading').classList.add('hidden');
+        document.getElementById('ai-card').classList.remove('hidden');
+        document.getElementById('ai-content').innerHTML = `<div class="text-red-600 font-mono text-sm p-3 bg-red-50 dark:bg-red-900/20 rounded-xl">Error: ${e.message}</div>`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph ph-magnifying-glass"></i><span>Get Recommendations</span>';
+    }
+}
+
+function renderTravelTable(restaurants) {
+    const tbody = document.getElementById('travel-table-body');
+    tbody.innerHTML = restaurants.map(r => {
+        const feasible = r.is_feasible !== false;
+        const dist = r.distance_km != null ? r.distance_km.toFixed(1) + ' km' : '—';
+        const oneway = r.travel_minutes_one_way != null ? Math.round(r.travel_minutes_one_way) + ' min' : '—';
+        const total  = r.total_time_minutes != null ? Math.round(r.total_time_minutes) + ' min' : '—';
+        const feasBadge = feasible
+            ? '<span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-green-100 text-green-700 border border-green-200">✓ Yes</span>'
+            : '<span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200">✗ Too far</span>';
+        return `<tr class="border-b border-obsidian/6 dark:border-darkborder hover:bg-parchment/40 dark:hover:bg-darkborder/30 transition-colors">
+            <td class="py-2.5 px-3 font-medium text-xs">${r.restaurant_name || '—'}</td>
+            <td class="py-2.5 px-3 font-mono text-xs text-sage">${dist}</td>
+            <td class="py-2.5 px-3 font-mono text-xs text-sage">${oneway}</td>
+            <td class="py-2.5 px-3 font-mono text-xs text-sage">${total}</td>
+            <td class="py-2.5 px-3">${feasBadge}</td>
+        </tr>`;
+    }).join('');
+    document.getElementById('travel-table-wrap').classList.remove('hidden');
+}
+
+function renderQuickLinks(restaurants) {
+    const container = document.getElementById('quick-links-body');
+    container.innerHTML = restaurants.map(r => {
+        const maps = r.google_maps_link || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((r.restaurant_name||'')+' '+(r.city||''))}`;
+        const dir  = r.google_maps_directions || maps;
+        return `
+        <a href="${maps}" target="_blank" class="text-xs px-3 py-1.5 rounded-full bg-sand dark:bg-darkborder border border-obsidian/10 dark:border-darkborder text-terracotta hover:border-terracotta transition-colors font-mono flex items-center gap-1">
+            <i class="ph ph-map-pin text-xs"></i> ${r.restaurant_name}
+        </a>
+        <a href="${dir}" target="_blank" class="text-xs px-3 py-1.5 rounded-full bg-sand dark:bg-darkborder border border-obsidian/10 dark:border-darkborder text-sage hover:border-terracotta hover:text-terracotta transition-colors font-mono flex items-center gap-1">
+            <i class="ph ph-navigation-arrow text-xs"></i> Directions
+        </a>
+        ${r.source_url ? `
+        <a href="${r.source_url}" target="_blank" class="text-xs px-3 py-1.5 rounded-full bg-sand dark:bg-darkborder border border-red-500/30 text-red-600 dark:text-red-400 hover:border-red-500 transition-colors font-mono flex items-center gap-1 mr-2">
+            <i class="ph ph-youtube-logo text-xs text-red-500"></i> Video
+        </a>` : ''}`;
+    }).join('');
+    document.getElementById('quick-links-wrap').classList.remove('hidden');
+}
+
+function renderMap(restaurants, userLocation) {
+    document.getElementById('map-wrap').classList.remove('hidden');
+
+    // Initialize or reset map
+    if (leafletMap) {
+        leafletMap.remove();
+        leafletMap = null;
+    }
+    // Clear old markers
+    mapMarkers = [];
+
+    const mapEl = document.getElementById('food-leaflet-map');
+    mapEl.style.height = '380px';
+
+    // Find center
+    const validRests = restaurants.filter(r => r._lat && r._lon);
+    let center = [20.5937, 78.9629]; // India default
+    if (userLocation && userLocation.lat) center = [userLocation.lat, userLocation.lon];
+    else if (validRests.length > 0) center = [validRests[0]._lat, validRests[0]._lon];
+
+    leafletMap = L.map('food-leaflet-map', { zoomControl: true, scrollWheelZoom: false }).setView(center, 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(leafletMap);
+
+    // User pin
+    if (userLocation && userLocation.lat) {
+        L.circleMarker([userLocation.lat, userLocation.lon], {
+            radius: 10, fillColor: '#1D4ED8', color: '#fff', weight: 2, fillOpacity: 0.9
+        }).addTo(leafletMap).bindPopup('<b>Your Location</b>');
+    }
+
+    // Restaurant pins
+    const colors = { true: '#22c55e', false: '#ef4444', unknown: '#f59e0b' };
+    validRests.forEach(r => {
+        const feasible = r.is_feasible;
+        const color = feasible === true ? '#22c55e' : feasible === false ? '#ef4444' : '#f59e0b';
+        const crowd = r.crowd_at_arrival;
+        const hrs   = r.opening_status;
+        const popupHtml = `
+            <div style="font-family:'Plus Jakarta Sans',sans-serif;min-width:180px;">
+                <b style="font-size:14px;">${r.restaurant_name || ''}</b><br>
+                <span style="font-size:11px;color:#5A6560;">${r.area_or_locality||''}, ${r.city||''}</span><br><br>
+                ${r.geo_note ? `<span style="font-size:11px;">📍 ${r.geo_note}</span><br>` : ''}
+                ${hrs ? `<span style="font-size:11px;">${hrs.status_emoji||''} ${hrs.status_label||''}</span><br>` : ''}
+                ${crowd ? `<span style="font-size:11px;">${crowd.crowd_emoji||''} ${crowd.crowd_level||''} crowd</span><br>` : ''}
+                ${r.google_maps_link ? `<a href="${r.google_maps_link}" target="_blank" style="font-size:11px;color:#C86D51;">View on Maps →</a>` : ''}
+            </div>`;
+        const marker = L.circleMarker([r._lat, r._lon], {
+            radius: 10, fillColor: color, color: '#fff', weight: 2, fillOpacity: 0.9
+        }).addTo(leafletMap).bindPopup(popupHtml);
+        mapMarkers.push(marker);
+    });
+
+    // Fit bounds
+    if (validRests.length > 0) {
+        const points = validRests.map(r => [r._lat, r._lon]);
+        if (userLocation && userLocation.lat) points.push([userLocation.lat, userLocation.lon]);
+        leafletMap.fitBounds(points, { padding: [40, 40] });
+    }
+}
+
+// ─── Add Video ─────────────────────────────────────────────
+function switchAddTab(tab) {
+    document.getElementById('add-panel-playlist').classList.toggle('hidden', tab !== 'playlist');
+    document.getElementById('add-panel-video').classList.toggle('hidden', tab !== 'video');
+    ['playlist','video'].forEach(t => {
+        const btn = document.getElementById(`add-tab-${t}`);
+        if (t === tab) {
+            btn.classList.add('bg-obsidian','dark:bg-terracotta','text-white');
+            btn.classList.remove('text-obsidian/70','dark:text-white/70');
+        } else {
+            btn.classList.remove('bg-obsidian','dark:bg-terracotta','text-white');
+            btn.classList.add('text-obsidian/70','dark:text-white/70');
+        }
+    });
+}
+
+async function linkPlaylist() {
+    const url     = document.getElementById('playlist-url').value.trim();
+    const statusEl = document.getElementById('playlist-status');
+    if (!url) { alert('Please enter a playlist URL.'); return; }
+
+    const btn = document.getElementById('playlist-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></div><span>Syncing…</span>';
+
+    statusEl.classList.remove('hidden');
+    statusEl.className = 'mt-4 p-3 rounded-xl font-mono text-xs bg-obsidian/5 dark:bg-darkborder/30 text-sage';
+    statusEl.textContent = 'Extracting playlist videos via yt-dlp…';
+
+    try {
+        const res = await fetch('/api/link_playlist', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                playlist_url: url,
+                user_id: currentUser?.user_id || 'guest',
+                user_name: currentUser?.display_name || 'Guest'
+            })
+        });
+        const data = await res.json();
+        if (data.ok) {
+            statusEl.className = 'mt-4 p-3 rounded-xl font-mono text-xs bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-900/30';
+            statusEl.textContent = `✓ ${data.message}`;
+            loadSidebarData();
+        } else {
+            statusEl.className = 'mt-4 p-3 rounded-xl font-mono text-xs bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/30';
+            statusEl.textContent = `✗ ${data.message}`;
+        }
+    } catch(e) {
+        statusEl.className = 'mt-4 p-3 rounded-xl font-mono text-xs bg-red-50 text-red-700 border border-red-200';
+        statusEl.textContent = `Network error: ${e.message}`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph ph-arrows-clockwise"></i><span>Link Playlist</span>';
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function loadUserPlaylists() {
+    const listEl = document.getElementById('linked-playlists-list');
+    const countEl = document.getElementById('linked-playlists-count');
+    if (!listEl) return;
+
+    const uid = getActiveUserId();
+    if (!uid || uid === 'guest') {
+        listEl.innerHTML = `
+            <div class="p-5 rounded-2xl border border-dashed border-obsidian/15 dark:border-white/15 text-center">
+                <i class="ph ph-lock text-xl text-sage mb-1 block"></i>
+                <div class="text-xs font-semibold mb-0.5 text-obsidian dark:text-white">Sign in to view linked playlists</div>
+                <div class="text-[11px] text-sage font-mono">Sign in to sync and manage your personal YouTube food playlists.</div>
+            </div>`;
+        if (countEl) countEl.textContent = '0 linked';
+        return;
+    }
+
+    try {
+        const res = await fetch(`/api/user/playlists?user_id=${encodeURIComponent(uid)}`);
+        const data = await res.json();
+        const playlists = data.ok && Array.isArray(data.playlists) ? data.playlists : [];
+
+        if (countEl) {
+            countEl.textContent = `${playlists.length} linked`;
+        }
+
+        if (playlists.length === 0) {
+            listEl.innerHTML = `
+                <div class="p-6 rounded-2xl border border-dashed border-obsidian/15 dark:border-white/15 text-center">
+                    <i class="ph ph-playlist text-2xl text-sage mb-2 block"></i>
+                    <div class="text-sm font-medium mb-1 text-obsidian dark:text-white">No playlists linked yet</div>
+                    <div class="text-xs text-sage font-mono">Paste a YouTube food playlist URL above to link it to your account.</div>
+                </div>`;
+            return;
+        }
+
+        listEl.innerHTML = playlists.map(pl => {
+            const rawUrl = pl.url || '#';
+            const countLabel = pl.video_count === 1 ? '1 video' : `${pl.video_count} videos`;
+            return `
+                <div class="p-4 rounded-2xl bg-sand/60 dark:bg-white/[0.03] border border-obsidian/8 dark:border-darkborder flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:border-terracotta/30">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                            <i class="ph ph-playlist text-terracotta text-sm flex-shrink-0"></i>
+                            <span class="font-serif font-semibold text-sm truncate text-obsidian dark:text-white">${escapeHtml(pl.name || 'Food Playlist')}</span>
+                            <span class="font-mono text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20 flex-shrink-0">Auto-sync Active</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] text-sage">
+                            <span class="flex items-center gap-1"><i class="ph ph-video"></i> ${countLabel}</span>
+                            <span>•</span>
+                            <span class="flex items-center gap-1"><i class="ph ph-clock"></i> Synced: ${escapeHtml(pl.last_synced || 'Recently')}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <a href="${escapeHtml(rawUrl)}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-full bg-obsidian/6 dark:bg-white/10 hover:bg-obsidian/10 dark:hover:bg-white/15 text-xs font-mono flex items-center gap-1.5 transition-colors text-obsidian dark:text-white">
+                            <i class="ph ph-youtube-logo text-red-500 text-sm"></i>
+                            <span>View on YouTube</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch(e) {
+        listEl.innerHTML = '<div class="text-xs text-red-500 font-mono py-2 text-center">Error loading linked playlists.</div>';
+    }
+}
+
+async function triggerPlaylistSync() {
+    const uid = getActiveUserId();
+    if (!uid || uid === 'guest') return;
+
+    const btn = document.getElementById('sync-now-btn');
+    const icon = document.getElementById('sync-now-icon');
+    const text = document.getElementById('sync-now-text');
+
+    if (btn) btn.disabled = true;
+    if (icon) icon.classList.add('animate-spin');
+    if (text) text.textContent = 'Checking…';
+
+    try {
+        const res = await fetch('/api/user/sync_playlists', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ user_id: uid })
+        });
+        const data = await res.json();
+        if (data.ok) {
+            if (text) text.textContent = 'Syncing…';
+            // Periodically refresh list while syncing in background
+            const interval = setInterval(async () => {
+                await loadUserPlaylists();
+                await loadSidebarData();
+            }, 5000);
+            setTimeout(() => clearInterval(interval), 30000);
+        }
+    } catch(e) {
+        console.error("Sync error:", e);
+    } finally {
+        setTimeout(() => {
+            if (btn) btn.disabled = false;
+            if (icon) icon.classList.remove('animate-spin');
+            if (text) text.textContent = 'Sync Now';
+        }, 2000);
+    }
+}
+
+async function processVideo() {
+    const url    = document.getElementById('video-url').value.trim();
+    const logEl  = document.getElementById('video-log');
+    if (!url) { alert('Please enter a YouTube URL.'); return; }
+
+    const btn = document.getElementById('video-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin"></div><span>Processing…</span>';
+
+    logEl.classList.remove('hidden');
+    logEl.textContent = 'Starting video processing… (this can take 2-5 minutes)\n';
+
+    try {
+        const res = await fetch('/api/add_video', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                url,
+                user_id: currentUser?.user_id || 'guest',
+                user_name: currentUser?.display_name || 'Guest'
+            })
+        });
+        const data = await res.json();
+        logEl.textContent = (data.log || '') + '\n\n' + (data.ok ? '✓ Done!' : `✗ ${data.message}`);
+        logEl.scrollTop = logEl.scrollHeight;
+        if (data.ok) {
+            // Reload DB
+            allRestaurants = [];
+            loadSidebarData();
+        }
+    } catch(e) {
+        logEl.textContent += `\nNetwork error: ${e.message}`;
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph ph-play-circle"></i><span>Process Video</span>';
+    }
+}
+
+// ─── On first paint activate search page ──────────────────
+// (done in DOMContentLoaded)
+</script>
+
+</body>
+</html>

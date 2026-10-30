@@ -1,0 +1,134 @@
+/* Food Discovery AI — Playlist Sync Bar (injected on playlist pages only) */
+
+#fd-playlist-sync-bar {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: linear-gradient(135deg, #1A1E24 0%, #121418 100%);
+  border-bottom: 2px solid #FF6B35;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.fd-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  gap: 12px;
+}
+
+.fd-bar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fd-logo {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.fd-bar-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fd-bar-title {
+  font-weight: 700;
+  font-size: 13px;
+  color: #FFFFFF;
+  letter-spacing: 0.2px;
+}
+
+.fd-bar-sub {
+  font-size: 11px;
+  color: #A0AEC0;
+}
+
+.fd-bar-sub strong {
+  color: #EDF2F7;
+}
+
+.fd-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.fd-count {
+  font-size: 12px;
+  color: #718096;
+  white-space: nowrap;
+}
+
+.fd-sync-btn {
+  background: linear-gradient(135deg, #FF6B35, #E63946);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.fd-sync-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(255, 107, 53, 0.5);
+}
+
+.fd-sync-btn:disabled {
+  background: #2D3748;
+  color: #718096;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.fd-close-btn {
+  background: none;
+  border: none;
+  color: #718096;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.fd-close-btn:hover {
+  color: #E63946;
+  background: rgba(230, 57, 70, 0.1);
+}
+
+.fd-bar-status {
+  padding: 6px 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fd-bar-status.fd-hidden {
+  display: none;
+}
+
+.fd-bar-status.fd-info {
+  background: rgba(255, 179, 71, 0.1);
+  color: #FFB347;
+}
+
+.fd-bar-status.fd-success {
+  background: rgba(46, 196, 182, 0.1);
+  color: #2EC4B6;
+}
+
+.fd-bar-status.fd-error {
+  background: rgba(230, 57, 70, 0.1);
+  color: #E63946;
+}

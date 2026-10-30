@@ -1,0 +1,482 @@
+{
+  "_instructions": {
+    "how_to_add_videos": "Run find_videos.py to auto-discover real videos, OR manually add URLs here.",
+    "finding_shorts": "On YouTube, search 'bengaluru food hidden gem' then filter by Short. Copy URL.",
+    "instagram_reels": "For public Instagram reels: https://www.instagram.com/reel/CODE/"
+  },
+  "bengaluru": [
+    {
+      "url": "https://www.youtube.com/watch?v=ToSJ1Xfw_PE",
+      "notes": "Best Indian Food - LAMB CHOP PARADISE + Crispiest Dosa - already processed",
+      "duration_seconds": 2063,
+      "type": "long_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/Fd0gVsrVrh0",
+      "notes": "?The Srirangam Cafe #bangalore #indiranagar #masaladosa #podiidli #buttonidli #v",
+      "duration_seconds": 166,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/e5UvPWOLNo8",
+      "notes": "?Bangalore le Vettai Ada Porom ????| Idris Explores | #shorts",
+      "duration_seconds": 82,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/8TdfJ7NAc68",
+      "notes": "??Bangalore-? ?????????? ???? ????????????? ..??? #shorts",
+      "duration_seconds": 129,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/jRjDbP8Y5ko",
+      "notes": "Best Chicken Burger in Bangalore? #shorts #youtubeshorts",
+      "duration_seconds": 27,
+      "type": "short_form",
+      "processed": false
+    },
+    {
+      "url": "https://www.youtube.com/shorts/Zf9vMcYVr8c",
+      "notes": "Bangalore la ?????????????? Style la Breakfast!!! Famous Dish Paddu! #shorts #ba",
+      "duration_seconds": 62,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/wd5pNnI11dc",
+      "notes": "Naru Noodle Bar: A Hidden Gem in Bangalore for Delicious Ramen",
+      "duration_seconds": 71,
+      "type": "short_form",
+      "processed": false
+    },
+    {
+      "url": "https://www.youtube.com/shorts/5bluRL_D5Ok",
+      "notes": "MARMALADE- COME VISIT THIS HIDDEN GEM IN YELAHANKA @marmaladebangalore4046",
+      "duration_seconds": 85,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/SaYejD02r0Q",
+      "notes": "Stonny brook| the hidden island | restaurants in Bangalore | pfc",
+      "duration_seconds": 166,
+      "type": "short_form",
+      "processed": false
+    },
+    {
+      "url": "https://www.youtube.com/shorts/JEPU8VJd0tY",
+      "notes": "Bangalore Varthur's Hidden Gem: Must-Try Biryani at Junction Restaurant ? | Beng",
+      "duration_seconds": 91,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/14KvNdWR2to",
+      "notes": "Mall Day in Bangalore?FORUM SOUTH ?Short Vlog? #bangalore #forum #vlog #bangalor",
+      "duration_seconds": 90,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/aFo3r2h2CaU",
+      "notes": "Corner House DBC & Cafe Caramel - Ice Cream in Bangalore",
+      "duration_seconds": 58,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=kCKMivJdqUY",
+      "notes": "Coimbatore la ipdi oru chilli chicken spot ah 🤯 #coimbatorefoods",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=9hUjnaZGWlc",
+      "notes": "Better Than Taaza Thindi? Brahmin Tiffins Jayanagar Review",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=RN3HjuMrJgU",
+      "notes": "My Bangalore food list, built over years of eating my way through the city:",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=duYLowXlkos",
+      "notes": "Guess The Price of This Giant Jug Juice! Al-Bek Review",
+      "type": "short_form",
+      "processed": true
+    }
+  ],
+  "coimbatore": [
+    {
+      "url": "https://www.youtube.com/shorts/Np82sdZrj_E",
+      "notes": "??Coimbatore-? ?????? ??? ?????..??? #shorts",
+      "duration_seconds": 65,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/zKAWLc1f9Cs",
+      "notes": "5 Must Try Food in Coimbatore | Top 5 | Coimbatore Street Food | Telugu Bucket",
+      "duration_seconds": 46,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/h0jTVm1fPGQ",
+      "notes": "WORLD FAMOUS CHICKEN SHAWARMA ROLL STREET FOOD COIMBATORE",
+      "duration_seconds": 44,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/Np82sdZrj_E",
+      "notes": "??Coimbatore-? ?????? ??? ?????..??? #shorts",
+      "duration_seconds": 65,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/8CxOV3c1-js",
+      "notes": "Vera level taste ?Aradhanas Restaurant Coimbatore || Foodie Review ||Coimbatore ",
+      "duration_seconds": 135,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/id_y9D4Iqqc",
+      "notes": "Food review on Favourite Restaurant in Coimbatore @HanuALaya",
+      "duration_seconds": 41,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/pu0jX89GjSw",
+      "notes": "Coimbatore Vegetarian Restaurant You Must Try / Kootansoru Restaurant Coimbatore",
+      "duration_seconds": 153,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/3_b9i0RfgVk",
+      "notes": "Kings park restaurant Coimbatore Food review | Hot? pepper? Chicken?, Chicken? 7",
+      "duration_seconds": 62,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/j4xMRV97qk0",
+      "notes": "100 Years Old Veg Spot in Coimbatore",
+      "duration_seconds": 34,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/I1JU63uJEgc",
+      "notes": "Valarmathi Mess - Epic South Indian 9/10 Meal Coimbatore",
+      "duration_seconds": 93,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/HcAeZqernhA",
+      "notes": "Top 5 Meals Spots in Coimbatore",
+      "duration_seconds": 64,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/LzIVHDn2CPQ",
+      "notes": "Added via web UI for Coimbatore",
+      "duration_seconds": null,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/q1isX-bcm3E",
+      "notes": "Added via web UI for Coimbatore",
+      "duration_seconds": null,
+      "type": "short_form",
+      "processed": false
+    },
+    {
+      "url": "https://www.youtube.com/shorts/g70MM2LJ2w8",
+      "notes": "Added via web UI for Coimbatore",
+      "duration_seconds": null,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/-D4qNQNoFT4",
+      "notes": "Added via web UI for Coimbatore",
+      "duration_seconds": null,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/oBuYcVSOE2M",
+      "notes": "Added via web UI for Coimbatore",
+      "duration_seconds": null,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=WAx6c2R89XI",
+      "notes": "🤯 Coimbatore's NEW Non-Veg Dosa Spot! Must Try 🔥 #walkwithjai #food #dinner #biriyani",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=q47p2_MWsr4",
+      "notes": "🔥coimbatore la super ana non veg meals🥵 #walkwithjai #gowrimess #biriyani",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=y-lR0dLy9_w",
+      "notes": "Best food spot in Coimbatore 🥳 | Budget friendly food in Coimbatore | Must try food spot breakfast",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=e1uai53t_7U",
+      "notes": "Lunch spot for veg lovers..!!😊🙌❤️ #food #coimbatore #vegetables #lunch #foodie",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=T6R4VgN7zO8",
+      "notes": "💥Major 5 spots in Coimbatore 💥| that smoking thing #food #coimbatore #dosa #biriyani #foodie",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=42CHmilCGt4",
+      "notes": "Coimbatore NON VEG FOOD Tour I Kovai BIRYANI + Karandi Omelette + Chicken (Pallipalayam + Bachelors)",
+      "type": "long_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=k1SeWw_GuRM",
+      "notes": "TASTE ARABIA 📍Sungam Bypass Road , Ukkadam Coimbatore",
+      "type": "short_form",
+      "processed": true
+    }
+  ],
+  "hyderabad": [
+    {
+      "url": "https://www.youtube.com/shorts/ejnGslZ6UdA",
+      "notes": "KSN Iyengar Bhavan Moula Ali - Best Veg Meals",
+      "duration_seconds": 50,
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/NT4Y_YMAX4A",
+      "notes": "₹650 Ki Non-Veg Meal Worth Ah? 🍗 Ara Telugu Kitchen Review",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/shorts/QjXpCOJOKRo",
+      "notes": "Vedham Restaurant Honest Review 🍽️ | Long Waits & Overhyped Dishes?",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=3v0bP_hvjQI",
+      "notes": "Jackfruit Biryani That Made Me Forget I Was Eating Veg | Mr. Mamakaram Pure Veg Restaurant Review",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=PLPRdnIUOEE",
+      "notes": "So Many Items for Just ₹200? | Dakshina Desapu Ruchulu Meals Review 🍛",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=KJ3iyT-itnY",
+      "notes": "Aranyam..💚🐒🌴 Jungle Theme Restaurant In Karimnagar#aranyam#restaurant #ytshorts#karimnagar#review",
+      "type": "short_form",
+      "processed": true
+    }
+  ],
+  "unknown": [
+    {
+      "url": "https://www.youtube.com/watch?v=ChX797qPtbU",
+      "notes": "Village Organic Kitchen Chinna Kaparthy",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=nY6Ubd3jo2E",
+      "notes": "The lavish Mandi Karimnagar 🤤 #ytshorts #food #borrababai",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=g8ljkumhLXU",
+      "notes": "TOWER SERIES PART-6 || RAJU TEASTALL || [ KARIMNAGAR]",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=8beOnwd5_Wc",
+      "notes": "Just for 150/- . Manki  famous raja mess kunda biryani dorkutundi.. #biryani #karimnagar",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=UWQGGMZt1JI",
+      "notes": "Karimnagar lo unlimited lunch buffet 149/-Rs ki #ytshorts #shorts",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=-AkIFHByvYc",
+      "notes": "Prakruthi 🏡🍱 #youtubeshorts #shortsvideo #karimnagar #restaurant  #resort #foodvlog #vlogs",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=md-M08PQF30",
+      "notes": "Best restaurant in karimnagar",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=q_I2sA1bfOM",
+      "notes": "Bagdadi Restaurant Colaba#kunalvijayakar #thebigforkers #bagdadirestaurant #khaanemeinkyahai #colaba",
+      "type": "short_form",
+      "processed": true
+    }
+  ],
+  "telangana": [
+    {
+      "url": "https://www.youtube.com/watch?v=ojcdVRdrGys",
+      "notes": "SELLING 4000 SAMOSA IN KARIMNAGAR🔥||#samosa #samosarecipe #karimnagar #chickenbiryani #telangana",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=L3w_HW9V3pg",
+      "notes": "SINCE 1979 FAMOUS BADAM AT ₹40 IN KARIMNAGAR🔥||#badammilk #karimnagar #telangana #chickenbiryani",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=UUD5rYk4Aek",
+      "notes": "Excellent Mutton biryani at peacock restaurant karimnagar Lassi nawabi #shorts #mutton #foodie",
+      "type": "short_form",
+      "processed": true
+    }
+  ],
+  "mumbai": [
+    {
+      "url": "https://www.youtube.com/watch?v=737oasve3sE",
+      "notes": "10 BEST DISHES I Tried In Mumbai!! Part 1 ☕️🍨 🤤",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=4fh9MiCNjeg",
+      "notes": "Trying Overhyped Places in Mumbai!! 😳🍦🍕",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=0sop5gqEwII",
+      "notes": "Have you tried Korean food in Mumbai?🍜",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=gaBD__8sPM0",
+      "notes": "5 BEST DISHES I Tried In Mumbai!! Part 2!! 🤤🍹🍔",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=JlLmL44ztjw",
+      "notes": "6 BOTH Pure-Veg Restaurants in📍Mumbai New & Old🍽️#pureveg #chowpatty #lalbaug #vegthali #paneer",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=yMn9C4vewVU",
+      "notes": "3 Must Try food places around South Mumbai #Shorts #mumbai #vadapav",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=kqpeX544ZXQ",
+      "notes": "Mumbai’s Iconic Bagdadi Restaurant – What We Ate Will Blow Your Mind!",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=YHiEkoFnUSQ",
+      "notes": "Mumbai Foodie’s I Know A Place S2 presented by Servd India @mumbaifoodie & &servd.india @Servd.india",
+      "type": "long_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=8BDa12uCOBc",
+      "notes": "An Epic Food Tour in Bandra, Mumbai!! 🤯🍽️",
+      "type": "short_form",
+      "processed": true
+    }
+  ],
+  "stockholm": [
+    {
+      "url": "https://www.youtube.com/watch?v=oHZo4Oyr6tc",
+      "notes": "Eating Swedish food for 24 hours 🇸🇪",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=X7a3rYmYemg",
+      "notes": "5 BEST Foods In Sweden! 😱 #sweden #food",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=_BMMn9BKocc",
+      "notes": "Lunch for everyone – welcome to a Swedish school canteen!",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=_idc8QssOAI",
+      "notes": "VIKING restaurant! - Aifur in Stockholm Sweden",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=FSMnrOrHLiI",
+      "notes": "everything i ate in sweden 🇸🇪🍳",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=vTEPT31aQpU",
+      "notes": "Must try food spots in Stockholm #stockholmrestaurants #stockholm",
+      "type": "short_form",
+      "processed": true
+    },
+    {
+      "url": "https://www.youtube.com/watch?v=ohY71lpDkrc",
+      "notes": "Stockholm Food Guide: Best Restaurants, Bakeries & Fika Spots in Sweden",
+      "type": "short_form",
+      "processed": true
+    }
+  ]
+}
